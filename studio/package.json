@@ -1,0 +1,26 @@
+{
+  "name": "studio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "sanity dev",
+    "build": "sanity build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "sanity": "^5.17.1",
+    "styled-components": "^6.3.11"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/styled-components": "^5.1.36",
+    "typescript": "^5.9.3"
+  }
+}
