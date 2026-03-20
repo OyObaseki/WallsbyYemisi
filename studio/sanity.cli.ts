@@ -5,5 +5,5 @@ export default defineCliConfig({
     projectId: '9x1w2hv6',
     dataset: 'production'
   },
-  studioHost: 'WallsByYemisi'
+  studioHost: 'wallsbyyemisi'
 })
