@@ -1,0 +1,246 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { sanityClient } from '../../lib/sanity';
+
+export async function getStaticPaths() {
+  let products: any[] = [];
+  try {
+    products = await sanityClient.fetch(`*[_type == "product"]{
+      _id,
+      title,
+      "description": pt::text(description),
+      "imageUrl": featuredImage.asset->url
+    }`);
+  } catch (error) {
+    console.error("Error fetching products from Sanity:", error);
+  }
+
+  // Fallback mock data if CMS is empty or errors
+  if (!products || products.length === 0) {
+    products = [
+      {
+        _id: "mock-1",
+        title: "Queen of Orisun",
+        description: "Original Canvas",
+        imageUrl: "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        _id: "mock-2",
+        title: "Night Bloom",
+        description: "Art Print",
+        imageUrl: "https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        _id: "mock-3",
+        title: "Golden Hour",
+        description: "Mixed Media",
+        imageUrl: "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        _id: "mock-4",
+        title: "Azure Deep",
+        description: "Original Canvas",
+        imageUrl: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      }
+    ];
+  }
+
+  return products.map((product) => ({
+    params: { id: product._id },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props;
+
+// Default price logic
+const pricing = {
+  "20x30": { frameless: 75000, framed: 83000 },
+  "24x36": { frameless: 85000, framed: 95000 },
+  "27x42": { frameless: 95000, framed: 110000 },
+  "36x48": { frameless: 105000, framed: 120000 },
+};
+
+---
+
+<Layout>
+  <!-- Header -->
+  <header class="flex items-center justify-between px-6 py-6 border-b border-[#EBE6DC] bg-[#FCFBF8]">
+    <div class="flex items-center gap-4">
+      <a href="/" class="text-xl font-bold tracking-tight text-[#2D2A26]">WallsbyYemisi</a>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <button class="w-10 h-10 rounded-full bg-[#F5F2EA] flex items-center justify-center text-[#333333] hover:bg-[#EAE5D9] transition" aria-label="Search">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+      </button>
+      <button class="w-10 h-10 rounded-full bg-[#2D2A26] flex items-center justify-center text-[#F5F2EA] hover:bg-black transition" aria-label="Cart">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+          <path d="M3 6h18"></path>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8 max-w-lg md:max-w-4xl">
+    <div class="flex flex-col md:flex-row gap-8 items-start">
+      <div class="w-full md:w-1/2">
+        <div class="relative w-full rounded-[32px] overflow-hidden shadow-sm bg-[#F5F2EA]">
+          <img src={product.imageUrl} alt={product.title} class="w-full h-auto object-cover mix-blend-multiply" />
+        </div>
+      </div>
+
+      <div class="w-full md:w-1/2 flex flex-col">
+        <h1 class="text-3xl font-bold text-[#2D2A26] mb-2">{product.title}</h1>
+        <p class="text-[#A39E93] text-lg mb-6">{product.description || 'Artwork'}</p>
+
+        <div class="mb-6">
+          <h3 class="font-semibold text-[#2D2A26] mb-3">Size</h3>
+          <div class="flex flex-wrap gap-3" id="size-options">
+            <button class="px-4 py-2 border-2 border-[#D4AF37] bg-[#F5F2EA] text-[#2D2A26] rounded-full font-medium transition size-btn active" data-size="20x30">20x30</button>
+            <button class="px-4 py-2 border-2 border-[#EBE6DC] text-[#A39E93] hover:border-[#D4AF37] rounded-full font-medium transition size-btn" data-size="24x36">24x36</button>
+            <button class="px-4 py-2 border-2 border-[#EBE6DC] text-[#A39E93] hover:border-[#D4AF37] rounded-full font-medium transition size-btn" data-size="27x42">27x42</button>
+            <button class="px-4 py-2 border-2 border-[#EBE6DC] text-[#A39E93] hover:border-[#D4AF37] rounded-full font-medium transition size-btn" data-size="36x48">36x48</button>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="font-semibold text-[#2D2A26] mb-3">Frame</h3>
+          <div class="flex flex-wrap gap-3" id="frame-options">
+            <button class="px-6 py-2 border-2 border-[#D4AF37] bg-[#F5F2EA] text-[#2D2A26] rounded-full font-medium transition frame-btn active" data-frame="frameless">Frameless</button>
+            <button class="px-6 py-2 border-2 border-[#EBE6DC] text-[#A39E93] hover:border-[#D4AF37] rounded-full font-medium transition frame-btn" data-frame="framed">Framed</button>
+          </div>
+        </div>
+
+        <div class="mt-auto border-t border-[#EBE6DC] pt-6 flex justify-between items-end">
+          <div>
+            <p class="text-[#A39E93] text-sm mb-1" id="measurement-display">20x30 Inches</p>
+            <span class="text-[#C59F58] font-bold text-3xl" id="price-display">₦75,000</span>
+          </div>
+          <button
+            id="buy-now-btn"
+            class="bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300"
+            data-paystack-btn
+            data-product-id={product._id}
+            data-product-title={product.title}
+          >
+            Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    import PaystackPop from '@paystack/inline-js';
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const pricing = {
+        "20x30": { frameless: 75000, framed: 83000 },
+        "24x36": { frameless: 85000, framed: 95000 },
+        "27x42": { frameless: 95000, framed: 110000 },
+        "36x48": { frameless: 105000, framed: 120000 },
+      };
+
+      let currentSize = "20x30";
+      let currentFrame = "frameless";
+
+      const sizeBtns = document.querySelectorAll('.size-btn');
+      const frameBtns = document.querySelectorAll('.frame-btn');
+      const priceDisplay = document.getElementById('price-display');
+      const measurementDisplay = document.getElementById('measurement-display');
+      const buyBtn = document.getElementById('buy-now-btn');
+
+      function updatePrice() {
+        const price = pricing[currentSize][currentFrame];
+        if (priceDisplay) {
+          priceDisplay.textContent = '₦' + price.toLocaleString();
+        }
+        if (measurementDisplay) {
+          measurementDisplay.textContent = currentSize + ' Inches';
+        }
+      }
+
+      sizeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          sizeBtns.forEach(b => {
+            b.classList.remove('border-[#D4AF37]', 'bg-[#F5F2EA]', 'text-[#2D2A26]');
+            b.classList.add('border-[#EBE6DC]', 'text-[#A39E93]');
+          });
+          const target = e.currentTarget as HTMLButtonElement;
+          target.classList.remove('border-[#EBE6DC]', 'text-[#A39E93]');
+          target.classList.add('border-[#D4AF37]', 'bg-[#F5F2EA]', 'text-[#2D2A26]');
+          currentSize = target.getAttribute('data-size') || "20x30";
+          updatePrice();
+        });
+      });
+
+      frameBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          frameBtns.forEach(b => {
+            b.classList.remove('border-[#D4AF37]', 'bg-[#F5F2EA]', 'text-[#2D2A26]');
+            b.classList.add('border-[#EBE6DC]', 'text-[#A39E93]');
+          });
+          const target = e.currentTarget as HTMLButtonElement;
+          target.classList.remove('border-[#EBE6DC]', 'text-[#A39E93]');
+          target.classList.add('border-[#D4AF37]', 'bg-[#F5F2EA]', 'text-[#2D2A26]');
+          currentFrame = target.getAttribute('data-frame') || "frameless";
+          updatePrice();
+        });
+      });
+
+      if (buyBtn) {
+        buyBtn.addEventListener('click', (e) => {
+          const btn = e.currentTarget as HTMLButtonElement;
+          const productId = btn.getAttribute('data-product-id');
+          const productTitle = btn.getAttribute('data-product-title');
+          const price = pricing[currentSize][currentFrame];
+
+          const popup = new PaystackPop();
+          popup.newTransaction({
+            key: 'pk_test_placeholder',
+            email: 'customer@example.com',
+            amount: price * 100, // Paystack expects amount in kobo
+            currency: 'NGN',
+            reference: 'txn_' + Math.floor((Math.random() * 1000000000) + 1),
+            metadata: {
+              custom_fields: [
+                {
+                  display_name: "Product ID",
+                  variable_name: "product_id",
+                  value: productId || ''
+                },
+                {
+                  display_name: "Product Title",
+                  variable_name: "product_title",
+                  value: productTitle || ''
+                },
+                {
+                  display_name: "Size",
+                  variable_name: "product_size",
+                  value: currentSize
+                },
+                {
+                  display_name: "Frame",
+                  variable_name: "product_frame",
+                  value: currentFrame
+                }
+              ]
+            },
+            onSuccess: (transaction: any) => {
+              alert(`Payment successful! Transaction reference: ${transaction.reference}`);
+            },
+            onCancel: () => {
+              console.log('Payment cancelled');
+            }
+          });
+        });
+      }
+    });
+  </script>
+</Layout>
