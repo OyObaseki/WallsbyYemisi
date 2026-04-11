@@ -24,11 +24,5 @@ export const product = defineType({
         hotspot: true,
       },
     }),
-    defineField({
-      name: 'variants',
-      title: 'Variants',
-      type: 'array',
-      of: [{ type: 'productVariant' }],
-    }),
   ],
 })
