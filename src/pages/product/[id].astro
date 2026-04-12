@@ -9,7 +9,8 @@ export async function getStaticPaths() {
       _id,
       title,
       "description": pt::text(description),
-      "imageUrl": featuredImage.asset->url
+      "imageUrl": featuredImage.asset->url,
+      "variants": variants[]{ size, frame, price, title }
     }`);
   } catch (error) {
     console.error("Error fetching products from Sanity:", error);
@@ -64,6 +65,9 @@ const pricing = {
 ---
 
 <Layout>
+  <!-- Pass product variants to the client -->
+  <div id="product-variants-data" data-variants={JSON.stringify(product.variants || [])} class="hidden"></div>
+
   <!-- Header -->
   <header class="flex items-center justify-between px-6 py-6 border-b border-[#EBE6DC] bg-[#FCFBF8]">
     <div class="flex items-center gap-4">
@@ -140,12 +144,22 @@ const pricing = {
     import PaystackPop from '@paystack/inline-js';
 
     document.addEventListener("DOMContentLoaded", () => {
-      const pricing = {
+      const fallbackPricing = {
         "20x30": { frameless: 75000, framed: 83000 },
         "24x36": { frameless: 85000, framed: 95000 },
         "27x42": { frameless: 95000, framed: 110000 },
         "36x48": { frameless: 105000, framed: 120000 },
       };
+
+      const variantsDataEl = document.getElementById('product-variants-data');
+      let variants = [];
+      if (variantsDataEl && variantsDataEl.getAttribute('data-variants')) {
+        try {
+          variants = JSON.parse(variantsDataEl.getAttribute('data-variants') || '[]');
+        } catch(e) {
+          console.error("Error parsing variants data:", e);
+        }
+      }
 
       let currentSize = "20x30";
       let currentFrame = "frameless";
@@ -157,7 +171,21 @@ const pricing = {
       const buyBtn = document.getElementById('buy-now-btn');
 
       function updatePrice() {
-        const price = pricing[currentSize][currentFrame];
+        let price = null;
+
+        // Try to find price from Sanity variants first
+        if (variants && variants.length > 0) {
+          const matchedVariant = variants.find((v: any) => v.size === currentSize && v.frame === currentFrame);
+          if (matchedVariant && matchedVariant.price) {
+            price = matchedVariant.price;
+          }
+        }
+
+        // Fallback to hardcoded pricing
+        if (price === null) {
+          price = fallbackPricing[currentSize as keyof typeof fallbackPricing]?.[currentFrame as 'frameless' | 'framed'] || 0;
+        }
+
         if (priceDisplay) {
           priceDisplay.textContent = '₦' + price.toLocaleString();
         }
@@ -199,7 +227,17 @@ const pricing = {
           const btn = e.currentTarget as HTMLButtonElement;
           const productId = btn.getAttribute('data-product-id');
           const productTitle = btn.getAttribute('data-product-title');
-          const price = pricing[currentSize][currentFrame];
+
+          let price = null;
+          if (variants && variants.length > 0) {
+            const matchedVariant = variants.find((v: any) => v.size === currentSize && v.frame === currentFrame);
+            if (matchedVariant && matchedVariant.price) {
+              price = matchedVariant.price;
+            }
+          }
+          if (price === null) {
+            price = fallbackPricing[currentSize as keyof typeof fallbackPricing]?.[currentFrame as 'frameless' | 'framed'] || 0;
+          }
 
           const popup = new PaystackPop();
           popup.newTransaction({
