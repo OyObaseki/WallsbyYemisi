@@ -37,5 +37,11 @@ export const product = defineType({
         ]
       }
     }),
+    defineField({
+      name: 'variants',
+      title: 'Variants',
+      type: 'array',
+      of: [{ type: 'productVariant' }],
+    }),
   ],
 })
