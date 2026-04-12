@@ -9,7 +9,8 @@ export async function getStaticPaths() {
       _id,
       title,
       "description": pt::text(description),
-      "imageUrl": featuredImage.asset->url
+      "imageUrl": featuredImage.asset->url,
+      variants
     }`);
   } catch (error) {
     console.error("Error fetching products from Sanity:", error);
@@ -128,6 +129,7 @@ const pricing = {
             data-paystack-btn
             data-product-id={product._id}
             data-product-title={product.title}
+            data-variants={JSON.stringify(product.variants || [])}
           >
             Buy Now
           </button>
@@ -155,6 +157,29 @@ const pricing = {
       const priceDisplay = document.getElementById('price-display');
       const measurementDisplay = document.getElementById('measurement-display');
       const buyBtn = document.getElementById('buy-now-btn');
+
+      // Override pricing with variants if available
+      if (buyBtn) {
+        try {
+          const variantsRaw = buyBtn.getAttribute('data-variants');
+          if (variantsRaw) {
+            const variants = JSON.parse(variantsRaw);
+            if (Array.isArray(variants) && variants.length > 0) {
+              variants.forEach((variant: any) => {
+                if (variant.size && variant.frameType && variant.price != null) {
+                  const sizeKey = variant.size.replace(' Inches', '');
+                  const frameKey = variant.frameType.toLowerCase();
+                  if (pricing[sizeKey]) {
+                    pricing[sizeKey][frameKey] = variant.price;
+                  }
+                }
+              });
+            }
+          }
+        } catch (e) {
+          console.error("Failed to parse variants", e);
+        }
+      }
 
       function updatePrice() {
         const price = pricing[currentSize][currentFrame];
