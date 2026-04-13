@@ -9,7 +9,8 @@ export async function getStaticPaths() {
       _id,
       title,
       "description": pt::text(description),
-      "imageUrl": featuredImage.asset->url
+      "imageUrl": featuredImage.asset->url,
+      variants
     }`);
   } catch (error) {
     console.error("Error fetching products from Sanity:", error);
@@ -40,7 +41,17 @@ export async function getStaticPaths() {
         _id: "mock-4",
         title: "Azure Deep",
         description: "Original Canvas",
-        imageUrl: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+        imageUrl: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        variants: [
+          { title: "20x30 Frameless", price: 75000 },
+          { title: "20x30 Framed", price: 83000 },
+          { title: "24x36 Frameless", price: 85000 },
+          { title: "24x36 Framed", price: 95000 },
+          { title: "27x42 Frameless", price: 95000 },
+          { title: "27x42 Framed", price: 110000 },
+          { title: "36x48 Frameless", price: 105000 },
+          { title: "36x48 Framed", price: 120000 }
+        ]
       }
     ];
   }
@@ -54,12 +65,37 @@ export async function getStaticPaths() {
 const { product } = Astro.props;
 
 // Default price logic
-const pricing = {
+let pricing: Record<string, Record<string, number>> = {
   "20x30": { frameless: 75000, framed: 83000 },
   "24x36": { frameless: 85000, framed: 95000 },
   "27x42": { frameless: 95000, framed: 110000 },
   "36x48": { frameless: 105000, framed: 120000 },
 };
+
+// Dynamic pricing from variants
+if (product.variants && Array.isArray(product.variants)) {
+  const dynamicPricing: Record<string, Record<string, number>> = {};
+
+  product.variants.forEach((v: any) => {
+    if (v.title && v.price) {
+      const parts = v.title.toLowerCase().split(' ');
+      if (parts.length >= 2) {
+        const size = parts[0]; // e.g., "20x30"
+        const frame = parts[1]; // e.g., "frameless" or "framed"
+
+        if (!dynamicPricing[size]) {
+          dynamicPricing[size] = {};
+        }
+        dynamicPricing[size][frame] = v.price;
+      }
+    }
+  });
+
+  // Only override if we successfully parsed some variants
+  if (Object.keys(dynamicPricing).length > 0) {
+    pricing = dynamicPricing;
+  }
+}
 
 ---
 
@@ -122,6 +158,7 @@ const pricing = {
             <p class="text-[#A39E93] text-sm mb-1" id="measurement-display">20x30 Inches</p>
             <span class="text-[#C59F58] font-bold text-3xl" id="price-display">₦75,000</span>
           </div>
+          <div id="pricing-data" data-pricing={JSON.stringify(pricing)} hidden></div>
           <button
             id="buy-now-btn"
             class="bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300"
@@ -140,15 +177,18 @@ const pricing = {
     import PaystackPop from '@paystack/inline-js';
 
     document.addEventListener("DOMContentLoaded", () => {
-      const pricing = {
-        "20x30": { frameless: 75000, framed: 83000 },
-        "24x36": { frameless: 85000, framed: 95000 },
-        "27x42": { frameless: 95000, framed: 110000 },
-        "36x48": { frameless: 105000, framed: 120000 },
-      };
-
       let currentSize = "20x30";
       let currentFrame = "frameless";
+
+      const pricingDataEl = document.getElementById('pricing-data');
+      let pricing = {};
+      if (pricingDataEl && pricingDataEl.getAttribute('data-pricing')) {
+        try {
+          pricing = JSON.parse(pricingDataEl.getAttribute('data-pricing') || '{}');
+        } catch(e) {
+          console.error("Error parsing pricing data", e);
+        }
+      }
 
       const sizeBtns = document.querySelectorAll('.size-btn');
       const frameBtns = document.querySelectorAll('.frame-btn');
