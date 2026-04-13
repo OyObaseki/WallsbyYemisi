@@ -136,27 +136,28 @@ if (product.variants && Array.isArray(product.variants)) {
         <p class="text-[#A39E93] text-lg mb-6">{product.description || 'Artwork'}</p>
 
         <div class="mb-6">
-          <h3 class="font-semibold text-[#2D2A26] mb-3">Size</h3>
-          <div class="flex flex-wrap gap-3" id="size-options">
-            <button class="px-4 py-2 border-2 border-[#D4AF37] bg-[#F5F2EA] text-[#2D2A26] rounded-full font-medium transition size-btn active" data-size="20x30">20x30</button>
-            <button class="px-4 py-2 border-2 border-[#EBE6DC] text-[#A39E93] hover:border-[#D4AF37] rounded-full font-medium transition size-btn" data-size="24x36">24x36</button>
-            <button class="px-4 py-2 border-2 border-[#EBE6DC] text-[#A39E93] hover:border-[#D4AF37] rounded-full font-medium transition size-btn" data-size="27x42">27x42</button>
-            <button class="px-4 py-2 border-2 border-[#EBE6DC] text-[#A39E93] hover:border-[#D4AF37] rounded-full font-medium transition size-btn" data-size="36x48">36x48</button>
-          </div>
-        </div>
-
-        <div class="mb-8">
-          <h3 class="font-semibold text-[#2D2A26] mb-3">Frame</h3>
-          <div class="flex flex-wrap gap-3" id="frame-options">
-            <button class="px-6 py-2 border-2 border-[#D4AF37] bg-[#F5F2EA] text-[#2D2A26] rounded-full font-medium transition frame-btn active" data-frame="frameless">Frameless</button>
-            <button class="px-6 py-2 border-2 border-[#EBE6DC] text-[#A39E93] hover:border-[#D4AF37] rounded-full font-medium transition frame-btn" data-frame="framed">Framed</button>
+          <h3 class="font-semibold text-[#2D2A26] mb-3">Variants</h3>
+          <div class="flex flex-wrap gap-3" id="variant-options">
+            {product.variants && Array.isArray(product.variants) ? (
+              product.variants.map((variant: any, index: number) => (
+                <button
+                  class={`px-4 py-2 border-2 rounded-full font-medium transition variant-btn ${index === 0 ? 'border-[#D4AF37] bg-[#F5F2EA] text-[#2D2A26] active' : 'border-[#EBE6DC] text-[#A39E93] hover:border-[#D4AF37]'}`}
+                  data-title={variant.title}
+                  data-price={variant.price}
+                >
+                  {variant.title}
+                </button>
+              ))
+            ) : (
+              <p class="text-[#A39E93]">No variants available.</p>
+            )}
           </div>
         </div>
 
         <div class="mt-auto border-t border-[#EBE6DC] pt-6 flex justify-between items-end">
           <div>
-            <p class="text-[#A39E93] text-sm mb-1" id="measurement-display">20x30 Inches</p>
-            <span class="text-[#C59F58] font-bold text-3xl" id="price-display">₦75,000</span>
+            <p class="text-[#A39E93] text-sm mb-1" id="measurement-display">{product.variants && product.variants.length > 0 ? product.variants[0].title : 'Variant'}</p>
+            <span class="text-[#C59F58] font-bold text-3xl" id="product-price">{product.variants && product.variants.length > 0 ? '₦' + product.variants[0].price.toLocaleString() : '₦0'}</span>
           </div>
           <div id="pricing-data" data-pricing={JSON.stringify(pricing)} hidden></div>
           <button
@@ -173,64 +174,44 @@ if (product.variants && Array.isArray(product.variants)) {
     </div>
   </main>
 
-  <script>
+  <script client:load>
     import PaystackPop from '@paystack/inline-js';
 
     document.addEventListener("DOMContentLoaded", () => {
-      let currentSize = "20x30";
-      let currentFrame = "frameless";
-
-      const pricingDataEl = document.getElementById('pricing-data');
-      let pricing = {};
-      if (pricingDataEl && pricingDataEl.getAttribute('data-pricing')) {
-        try {
-          pricing = JSON.parse(pricingDataEl.getAttribute('data-pricing') || '{}');
-        } catch(e) {
-          console.error("Error parsing pricing data", e);
-        }
-      }
-
-      const sizeBtns = document.querySelectorAll('.size-btn');
-      const frameBtns = document.querySelectorAll('.frame-btn');
-      const priceDisplay = document.getElementById('price-display');
+      const variantBtns = document.querySelectorAll('.variant-btn');
+      const priceDisplay = document.getElementById('product-price');
       const measurementDisplay = document.getElementById('measurement-display');
       const buyBtn = document.getElementById('buy-now-btn');
 
-      function updatePrice() {
-        const price = pricing[currentSize][currentFrame];
+      // Initialize with first variant if exists
+      let currentVariantTitle = variantBtns.length > 0 ? variantBtns[0].getAttribute('data-title') : '';
+      let currentVariantPrice = variantBtns.length > 0 ? parseInt(variantBtns[0].getAttribute('data-price') || '0', 10) : 0;
+
+      function updateDisplay() {
         if (priceDisplay) {
-          priceDisplay.textContent = '₦' + price.toLocaleString();
+          priceDisplay.textContent = '₦' + currentVariantPrice.toLocaleString();
         }
         if (measurementDisplay) {
-          measurementDisplay.textContent = currentSize + ' Inches';
+          measurementDisplay.textContent = currentVariantTitle;
         }
       }
 
-      sizeBtns.forEach(btn => {
+      variantBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
-          sizeBtns.forEach(b => {
-            b.classList.remove('border-[#D4AF37]', 'bg-[#F5F2EA]', 'text-[#2D2A26]');
+          // Remove active classes from all buttons
+          variantBtns.forEach(b => {
+            b.classList.remove('border-[#D4AF37]', 'bg-[#F5F2EA]', 'text-[#2D2A26]', 'active');
             b.classList.add('border-[#EBE6DC]', 'text-[#A39E93]');
           });
-          const target = e.currentTarget as HTMLButtonElement;
-          target.classList.remove('border-[#EBE6DC]', 'text-[#A39E93]');
-          target.classList.add('border-[#D4AF37]', 'bg-[#F5F2EA]', 'text-[#2D2A26]');
-          currentSize = target.getAttribute('data-size') || "20x30";
-          updatePrice();
-        });
-      });
 
-      frameBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          frameBtns.forEach(b => {
-            b.classList.remove('border-[#D4AF37]', 'bg-[#F5F2EA]', 'text-[#2D2A26]');
-            b.classList.add('border-[#EBE6DC]', 'text-[#A39E93]');
-          });
+          // Add active classes to the clicked button
           const target = e.currentTarget as HTMLButtonElement;
           target.classList.remove('border-[#EBE6DC]', 'text-[#A39E93]');
-          target.classList.add('border-[#D4AF37]', 'bg-[#F5F2EA]', 'text-[#2D2A26]');
-          currentFrame = target.getAttribute('data-frame') || "frameless";
-          updatePrice();
+          target.classList.add('border-[#D4AF37]', 'bg-[#F5F2EA]', 'text-[#2D2A26]', 'active');
+
+          currentVariantTitle = target.getAttribute('data-title') || '';
+          currentVariantPrice = parseInt(target.getAttribute('data-price') || '0', 10);
+          updateDisplay();
         });
       });
 
@@ -239,13 +220,12 @@ if (product.variants && Array.isArray(product.variants)) {
           const btn = e.currentTarget as HTMLButtonElement;
           const productId = btn.getAttribute('data-product-id');
           const productTitle = btn.getAttribute('data-product-title');
-          const price = pricing[currentSize][currentFrame];
 
           const popup = new PaystackPop();
           popup.newTransaction({
             key: 'pk_test_placeholder',
             email: 'customer@example.com',
-            amount: price * 100, // Paystack expects amount in kobo
+            amount: currentVariantPrice * 100, // Paystack expects amount in kobo
             currency: 'NGN',
             reference: 'txn_' + Math.floor((Math.random() * 1000000000) + 1),
             metadata: {
@@ -261,14 +241,9 @@ if (product.variants && Array.isArray(product.variants)) {
                   value: productTitle || ''
                 },
                 {
-                  display_name: "Size",
-                  variable_name: "product_size",
-                  value: currentSize
-                },
-                {
-                  display_name: "Frame",
-                  variable_name: "product_frame",
-                  value: currentFrame
+                  display_name: "Variant",
+                  variable_name: "product_variant",
+                  value: currentVariantTitle || ''
                 }
               ]
             },
