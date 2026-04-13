@@ -3,22 +3,19 @@
 > astro dev
 
 [vite] connected.
-23:57:13 [types] Generated 1ms
-23:57:13 [WARN] [content] Content config not loaded
-23:57:13 [vite] Re-optimizing dependencies because vite config has changed
- astro  v6.0.5 ready in 1882 ms
+12:46:06 [types] Generated 1ms
+12:46:06 [WARN] [content] Content config not loaded
+12:46:06 [vite] Re-optimizing dependencies because vite config has changed
+ astro  v6.0.5 ready in 2069 ms
 ┃ Local    http://localhost:4321/
 ┃ Network  use --host to expose
-23:57:13 watching for file changes...
+12:46:06 watching for file changes...
 
  update  ▶ New version of Astro available: 6.1.5
   Run npx @astrojs/upgrade to update
 
-23:58:19 [200] / 253ms
-23:58:20 [vite] ✨ new dependencies optimized: astro/runtime/client/dev-toolbar/entrypoint.js, astro/virtual-modules/transitions-router.js, astro/virtual-modules/transitions-types.js, astro/virtual-modules/transitions-events.js, astro/virtual-modules/transitions-swap-functions.js
-23:58:20 [vite] ✨ optimized dependencies changed. reloading
-23:58:22 [200] /product/236a9dae-6574-45f4-bfcd-a39b00cc12f5 27ms
-23:58:22 [200] /product/236a9dae-6574-45f4-bfcd-a39b00cc12f5 4ms
-23:58:23 [vite] ✨ new dependencies optimized: @paystack/inline-js
-23:58:23 [vite] ✨ optimized dependencies changed. reloading
-23:58:23 [200] /product/236a9dae-6574-45f4-bfcd-a39b00cc12f5 10ms
+12:47:36 [200] / 260ms
+12:47:36 [vite] ✨ new dependencies optimized: astro/runtime/client/dev-toolbar/entrypoint.js, astro/virtual-modules/transitions-router.js, astro/virtual-modules/transitions-types.js, astro/virtual-modules/transitions-events.js, astro/virtual-modules/transitions-swap-functions.js
+12:47:36 [vite] ✨ optimized dependencies changed. reloading
+13:00:41 [watch] src/pages/index.astro
+13:02:41 [watch] src/pages/index.astro
