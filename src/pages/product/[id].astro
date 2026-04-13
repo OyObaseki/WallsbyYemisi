@@ -176,7 +176,7 @@ if (product.variants && Array.isArray(product.variants)) {
   <script>
     import PaystackPop from '@paystack/inline-js';
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("astro:page-load", () => {
       let currentSize = "20x30";
       let currentFrame = "frameless";
 
