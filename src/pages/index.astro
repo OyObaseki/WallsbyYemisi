@@ -48,6 +48,8 @@ if (!products || products.length === 0) {
   ];
 }
 
+const featuredProducts = products.length >= 3 ? products.slice(0, 3) : products;
+
 ---
 
 <Layout>
@@ -76,27 +78,38 @@ if (!products || products.length === 0) {
 
   <main class="container mx-auto px-4 py-8 max-w-lg md:max-w-4xl">
     <!-- Featured Artist Hero -->
-    <section class="mb-12">
+    <section class="mb-12 hero-carousel-section">
       <div class="relative w-full h-[500px] rounded-[32px] overflow-hidden shadow-sm">
-        <img src="https://images.unsplash.com/photo-1542226601-bc82e276ae0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Featured Artwork" class="w-full h-full object-cover" />
-        <!-- Gradient Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <!-- Carousel Track -->
+        <div id="hero-carousel-track" class="flex w-full h-full transition-transform duration-500 ease-in-out cursor-grab active:cursor-grabbing">
+          {featuredProducts.map((product) => (
+            <div class="w-full h-full flex-shrink-0 relative">
+              <img src={product.imageUrl} alt={product.title} draggable="false" class="w-full h-full object-cover select-none pointer-events-none" />
+              <!-- Gradient Overlay -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
 
-        <!-- Text Content -->
-        <div class="absolute bottom-0 left-0 p-8 w-full">
-          <p class="text-[#EBE6DC] text-xs font-semibold tracking-widest uppercase mb-2">Featured Artist</p>
-          <h2 class="text-white text-4xl font-bold mb-6">Abstract Resonance</h2>
-          <button class="bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300">
-            Shop Now
-          </button>
+              <!-- Text Content -->
+              <div class="absolute bottom-0 left-0 p-8 w-full pointer-events-none">
+                <p class="text-[#EBE6DC] text-xs font-semibold tracking-widest uppercase mb-2">Featured Artist</p>
+                <h2 class="text-white text-4xl font-bold mb-6">{product.title}</h2>
+                <a href={`/product/${product._id}`} class="inline-block bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300 pointer-events-auto">
+                  Shop Now
+                </a>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       <!-- Slider Dots -->
-      <div class="flex justify-center items-center gap-2 mt-4">
-        <div class="w-2 h-2 rounded-full bg-[#EAE5D9]"></div>
-        <div class="w-6 h-2 rounded-full bg-[#D4AF37]"></div>
-        <div class="w-2 h-2 rounded-full bg-[#EAE5D9]"></div>
+      <div id="hero-carousel-dots" class="flex justify-center items-center gap-2 mt-4">
+        {featuredProducts.map((_, index) => (
+          <button
+            data-index={index}
+            class={`hero-dot rounded-full transition-all duration-300 ${index === 0 ? 'w-6 h-2 bg-[#D4AF37]' : 'w-2 h-2 bg-[#EAE5D9]'}`}
+            aria-label={`Go to slide ${index + 1}`}
+          ></button>
+        ))}
       </div>
     </section>
 
@@ -307,4 +320,204 @@ if (!products || products.length === 0) {
     }
   </style>
 
+  <script>
+    // Module level variable to clear interval
+    let autoSlideInterval;
+    let cleanupFunctions = [];
+
+    // Clear interval before swap to avoid memory leaks
+    document.addEventListener('astro:before-swap', () => {
+      if (autoSlideInterval) clearInterval(autoSlideInterval);
+      cleanupFunctions.forEach(fn => fn());
+      cleanupFunctions = [];
+    });
+
+    document.addEventListener('astro:page-load', () => {
+      const track = document.getElementById('hero-carousel-track');
+      const dots = document.querySelectorAll('.hero-dot');
+      if (!track || dots.length === 0) return;
+
+      let currentIndex = 0;
+      const slideCount = dots.length;
+      let startX = 0;
+      let startY = 0;
+      let currentTranslate = 0;
+      let prevTranslate = 0;
+      let isDragging = false;
+      let isScrolling = false;
+
+      function goToSlide(index) {
+        if (index < 0) index = slideCount - 1;
+        if (index >= slideCount) index = 0;
+        currentIndex = index;
+
+        track.style.transition = 'transform 0.5s ease-in-out';
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+        dots.forEach((dot, i) => {
+          if (i === currentIndex) {
+            dot.className = 'hero-dot w-6 h-2 rounded-full bg-[#D4AF37] transition-all duration-300';
+          } else {
+            dot.className = 'hero-dot w-2 h-2 rounded-full bg-[#EAE5D9] transition-all duration-300';
+          }
+        });
+      }
+
+      function nextSlide() {
+        goToSlide(currentIndex + 1);
+      }
+
+      function startAutoSlide() {
+        stopAutoSlide();
+        autoSlideInterval = setInterval(nextSlide, 5000);
+      }
+
+      function stopAutoSlide() {
+        if (autoSlideInterval) clearInterval(autoSlideInterval);
+      }
+
+      // Initialize
+      prevTranslate = currentIndex * -100;
+
+      // Dots click
+      dots.forEach((dot) => {
+        dot.addEventListener('click', (e) => {
+          const target = e.target as HTMLElement;
+          const index = parseInt(target.dataset.index || '0', 10);
+          goToSlide(index);
+          startAutoSlide();
+        });
+      });
+
+      // Touch and mouse events for swiping
+      function handleDragStart(e) {
+        // Only allow left click
+        if (e.type === 'mousedown' && e.button !== 0) return;
+
+        if (e.type === 'mousedown' && (e.target.tagName === 'IMG' || e.target.tagName === 'A')) {
+          e.preventDefault();
+        }
+
+        isDragging = true;
+        isScrolling = false;
+        startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+        startY = e.type.includes('mouse') ? e.pageY : e.touches[0].clientY;
+        stopAutoSlide();
+
+        const transformMatrix = window.getComputedStyle(track).getPropertyValue('transform');
+        if (transformMatrix !== 'none') {
+          prevTranslate = parseInt(transformMatrix.split(',')[4].trim());
+        } else {
+          prevTranslate = 0;
+        }
+        track.style.transition = 'none'; // Disable transition during drag
+      }
+
+      function handleDragMove(e) {
+        if (!isDragging) return;
+
+        const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+        const currentY = e.type.includes('mouse') ? e.pageY : e.touches[0].clientY;
+
+        const diffX = currentX - startX;
+        const diffY = currentY - startY;
+
+        // Determine if user is scrolling vertically
+        if (e.type.includes('touch') && Math.abs(diffY) > Math.abs(diffX) && !isScrolling) {
+          isDragging = false;
+          return;
+        }
+
+        // Prevent default scrolling only if we are swiping horizontally
+        if (e.cancelable && Math.abs(diffX) > Math.abs(diffY)) {
+          e.preventDefault();
+        }
+        isScrolling = true;
+
+        currentTranslate = prevTranslate + diffX;
+        track.style.transform = `translateX(${currentTranslate}px)`;
+      }
+
+      function handleDragEnd(e) {
+        if (!isDragging) return;
+        isDragging = false;
+
+        const endX = e.type.includes('mouse') ? e.pageX : (e.changedTouches ? e.changedTouches[0].clientX : startX);
+        const diffX = endX - startX;
+
+        // Threshold for swipe
+        if (Math.abs(diffX) > 50) {
+          if (diffX > 0) {
+            goToSlide(currentIndex - 1);
+          } else {
+            goToSlide(currentIndex + 1);
+          }
+        } else {
+          goToSlide(currentIndex); // Snap back
+        }
+        startAutoSlide();
+      }
+
+      // Touch Events
+      // Note: passive is false because we might preventDefault in touchmove
+      track.addEventListener('touchstart', handleDragStart, { passive: true });
+      track.addEventListener('touchmove', handleDragMove, { passive: false });
+      track.addEventListener('touchend', handleDragEnd);
+
+      // Mouse Events
+      track.addEventListener('mousedown', handleDragStart);
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('mouseup', handleDragEnd);
+
+      // Prevent dragging links from firing navigation when swiping
+      let isClickAllowed = true;
+
+      const mousedownClickAllow = () => { isClickAllowed = true; };
+      const touchstartClickAllow = () => { isClickAllowed = true; };
+
+      track.addEventListener('mousedown', mousedownClickAllow);
+      track.addEventListener('touchstart', touchstartClickAllow, { passive: true });
+
+      const mousemoveClickAllow = (e) => {
+        if (isDragging && Math.abs(e.movementX) > 0) {
+          isClickAllowed = false;
+        }
+      };
+
+      const touchmoveClickAllow = (e) => {
+        if (isDragging && isScrolling) {
+          isClickAllowed = false;
+        }
+      };
+
+      track.addEventListener('mousemove', mousemoveClickAllow);
+      track.addEventListener('touchmove', touchmoveClickAllow, { passive: false });
+
+      const links = track.querySelectorAll('a');
+      const clickHandler = (e) => {
+        if (!isClickAllowed) {
+          e.preventDefault();
+        }
+      };
+      links.forEach(link => {
+        link.addEventListener('click', clickHandler);
+      });
+
+      // Handle resize
+      const handleResize = () => {
+        goToSlide(currentIndex);
+      };
+      window.addEventListener('resize', handleResize);
+
+      // Setup cleanup
+      cleanupFunctions.push(() => {
+        window.removeEventListener('mousemove', handleDragMove);
+        window.removeEventListener('mouseup', handleDragEnd);
+        window.removeEventListener('resize', handleResize);
+      });
+
+      // Start auto slide initially
+      startAutoSlide();
+    });
+  </script>
 </Layout>
