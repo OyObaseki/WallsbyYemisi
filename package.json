@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@paystack/inline-js": "^2.22.8",
-    "@sanity/client": "^7.17.0",
+    "@sanity/client": "^7.20.0",
     "@tailwindcss/vite": "^4.2.1",
     "astro": "^6.0.5",
     "tailwindcss": "^4.2.1"
