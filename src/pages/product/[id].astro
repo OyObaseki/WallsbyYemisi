@@ -63,6 +63,7 @@ export async function getStaticPaths() {
 }
 
 const { product } = Astro.props;
+const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
 
 // Default price logic
 let pricing: Record<string, Record<string, number>> = {
@@ -165,6 +166,7 @@ if (product.variants && Array.isArray(product.variants)) {
             data-paystack-btn
             data-product-id={product._id}
             data-product-title={product.title}
+            data-paystack-key={paystackPublicKey}
           >
             Buy Now
           </button>
@@ -239,11 +241,18 @@ if (product.variants && Array.isArray(product.variants)) {
           const btn = e.currentTarget as HTMLButtonElement;
           const productId = btn.getAttribute('data-product-id');
           const productTitle = btn.getAttribute('data-product-title');
+          const paystackKey = btn.getAttribute('data-paystack-key');
           const price = pricing[currentSize][currentFrame];
+
+          if (!paystackKey) {
+            console.error('Paystack public key is missing');
+            alert('Payment configuration error. Please try again later.');
+            return;
+          }
 
           const popup = new PaystackPop();
           popup.newTransaction({
-            key: 'pk_test_placeholder',
+            key: paystackKey,
             email: 'customer@example.com',
             amount: price * 100, // Paystack expects amount in kobo
             currency: 'NGN',
