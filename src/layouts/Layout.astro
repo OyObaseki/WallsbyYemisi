@@ -19,6 +19,43 @@ import { ClientRouter } from 'astro:transitions';
 	</head>
 	<body class="bg-[#FCFBF8] text-[#333333] font-['Plus_Jakarta_Sans',_sans-serif]">
 		<slot />
+
+		<script lang="ts">
+			function updateCartBadge() {
+				const badges = document.querySelectorAll('.cart-badge');
+				if (badges.length === 0) return;
+
+				let cart = [];
+				try {
+					const savedCart = localStorage.getItem('cart');
+					if (savedCart) {
+						cart = JSON.parse(savedCart);
+					}
+				} catch (error) {
+					console.error('Error parsing cart from localStorage', error);
+				}
+
+				let totalQuantity = 0;
+				cart.forEach((item: any) => {
+					totalQuantity += item.quantity || 1;
+				});
+
+				badges.forEach((badge) => {
+					if (totalQuantity > 0) {
+						badge.textContent = totalQuantity.toString();
+						badge.classList.remove('hidden');
+					} else {
+						badge.classList.add('hidden');
+					}
+				});
+			}
+
+			// Update on page load
+			document.addEventListener("astro:page-load", updateCartBadge);
+
+			// Listen for custom event
+			document.addEventListener('cart-updated', updateCartBadge);
+		</script>
 	</body>
 </html>
 
