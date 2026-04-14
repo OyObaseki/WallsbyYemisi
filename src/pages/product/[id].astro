@@ -154,16 +154,16 @@ if (product.variants && Array.isArray(product.variants)) {
           </div>
         </div>
 
-        <div class="mt-auto border-t border-[#EBE6DC] pt-6 flex justify-between items-end">
+        <div class="mt-auto border-t border-[#EBE6DC] pt-6 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
           <div>
             <p class="text-[#A39E93] text-sm mb-1" id="measurement-display">20x30 Inches</p>
             <span class="text-[#C59F58] font-bold text-3xl" id="price-display">₦75,000</span>
           </div>
           <div id="pricing-data" data-pricing={JSON.stringify(pricing)} hidden></div>
-          <div class="flex gap-4">
+          <div class="flex flex-row gap-4 w-full lg:w-auto">
             <button
               id="add-to-cart-btn"
-              class="border-2 border-[#C59F58] text-[#C59F58] hover:bg-[#F5F2EA] px-8 py-3 rounded-full font-medium transition duration-300"
+              class="flex-1 flex items-center justify-center border-2 border-[#C59F58] text-[#C59F58] hover:bg-[#F5F2EA] px-8 py-3 rounded-full font-medium transition duration-300"
               data-product-id={product._id}
               data-product-title={product.title}
               data-product-image={product.imageUrl}
@@ -172,7 +172,7 @@ if (product.variants && Array.isArray(product.variants)) {
             </button>
             <button
               id="buy-now-btn"
-              class="bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300"
+              class="flex-1 flex items-center justify-center bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300"
               data-paystack-btn
               data-product-id={product._id}
               data-product-title={product.title}
