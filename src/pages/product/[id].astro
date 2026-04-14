@@ -114,13 +114,13 @@ if (product.variants && Array.isArray(product.variants)) {
           <path d="m21 21-4.3-4.3"></path>
         </svg>
       </button>
-      <button class="w-10 h-10 rounded-full bg-[#2D2A26] flex items-center justify-center text-[#F5F2EA] hover:bg-black transition" aria-label="Cart">
+      <a href="/cart" class="w-10 h-10 rounded-full bg-[#2D2A26] flex items-center justify-center text-[#F5F2EA] hover:bg-black transition" aria-label="Cart">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
           <path d="M3 6h18"></path>
           <path d="M16 10a4 4 0 0 1-8 0"></path>
         </svg>
-      </button>
+      </a>
     </div>
   </header>
 
@@ -160,16 +160,27 @@ if (product.variants && Array.isArray(product.variants)) {
             <span class="text-[#C59F58] font-bold text-3xl" id="price-display">₦75,000</span>
           </div>
           <div id="pricing-data" data-pricing={JSON.stringify(pricing)} hidden></div>
-          <button
-            id="buy-now-btn"
-            class="bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300"
-            data-paystack-btn
-            data-product-id={product._id}
-            data-product-title={product.title}
-            data-paystack-key={paystackPublicKey}
-          >
-            Buy Now
-          </button>
+          <div class="flex gap-4">
+            <button
+              id="add-to-cart-btn"
+              class="border-2 border-[#C59F58] text-[#C59F58] hover:bg-[#F5F2EA] px-8 py-3 rounded-full font-medium transition duration-300"
+              data-product-id={product._id}
+              data-product-title={product.title}
+              data-product-image={product.imageUrl}
+            >
+              Add to Cart
+            </button>
+            <button
+              id="buy-now-btn"
+              class="bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300"
+              data-paystack-btn
+              data-product-id={product._id}
+              data-product-title={product.title}
+              data-paystack-key={paystackPublicKey}
+            >
+              Buy Now
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -197,6 +208,7 @@ if (product.variants && Array.isArray(product.variants)) {
       const priceDisplay = document.getElementById('price-display');
       const measurementDisplay = document.getElementById('measurement-display');
       const buyBtn = document.getElementById('buy-now-btn');
+      const addToCartBtn = document.getElementById('add-to-cart-btn');
 
       function updatePrice() {
         const price = pricing[currentSize][currentFrame];
@@ -235,6 +247,46 @@ if (product.variants && Array.isArray(product.variants)) {
           updatePrice();
         });
       });
+
+      if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', (e) => {
+          const btn = e.currentTarget as HTMLButtonElement;
+          const productId = btn.getAttribute('data-product-id');
+          const productTitle = btn.getAttribute('data-product-title');
+          const productImage = btn.getAttribute('data-product-image');
+          const price = pricing[currentSize][currentFrame];
+
+          const item = {
+            id: productId,
+            title: productTitle,
+            image: productImage,
+            size: currentSize,
+            frame: currentFrame,
+            price: price,
+            quantity: 1
+          };
+
+          let cart = [];
+          try {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+              cart = JSON.parse(savedCart);
+            }
+          } catch (error) {
+            console.error('Error parsing cart from localStorage', error);
+          }
+
+          const existingItemIndex = cart.findIndex((i: any) => i.id === item.id && i.size === item.size && i.frame === item.frame);
+          if (existingItemIndex > -1) {
+            cart[existingItemIndex].quantity += 1;
+          } else {
+            cart.push(item);
+          }
+
+          localStorage.setItem('cart', JSON.stringify(cart));
+          alert('Added to cart!');
+        });
+      }
 
       if (buyBtn) {
         buyBtn.addEventListener('click', (e) => {
