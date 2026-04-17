@@ -154,10 +154,9 @@ if (product.variants && Array.isArray(product.variants)) {
             <button
               id="buy-now-btn"
               class="flex-1 flex items-center justify-center bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300"
-              data-paystack-btn
               data-product-id={product._id}
               data-product-title={product.title}
-              data-paystack-key={paystackPublicKey}
+              data-product-image={product.imageUrl}
             >
               Buy Now
             </button>
@@ -168,8 +167,6 @@ if (product.variants && Array.isArray(product.variants)) {
   </main>
 
   <script>
-    import PaystackPop from '@paystack/inline-js';
-
     document.addEventListener("astro:page-load", () => {
       let currentSize = "20x30";
       let currentFrame = "frameless";
@@ -274,53 +271,40 @@ if (product.variants && Array.isArray(product.variants)) {
           const btn = e.currentTarget as HTMLButtonElement;
           const productId = btn.getAttribute('data-product-id');
           const productTitle = btn.getAttribute('data-product-title');
-          const paystackKey = btn.getAttribute('data-paystack-key');
+          const productImage = btn.getAttribute('data-product-image');
           const price = pricing[currentSize][currentFrame];
 
-          if (!paystackKey) {
-            console.error('Paystack public key is missing');
-            alert('Payment configuration error. Please try again later.');
-            return;
+          const item = {
+            id: productId,
+            title: productTitle,
+            image: productImage,
+            size: currentSize,
+            frame: currentFrame,
+            price: price,
+            quantity: 1
+          };
+
+          let cart = [];
+          try {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+              cart = JSON.parse(savedCart);
+            }
+          } catch (error) {
+            console.error('Error parsing cart from localStorage', error);
           }
 
-          const popup = new PaystackPop();
-          popup.newTransaction({
-            key: paystackKey,
-            email: 'customer@example.com',
-            amount: price * 100, // Paystack expects amount in kobo
-            currency: 'NGN',
-            reference: 'txn_' + Math.floor((Math.random() * 1000000000) + 1),
-            metadata: {
-              custom_fields: [
-                {
-                  display_name: "Product ID",
-                  variable_name: "product_id",
-                  value: productId || ''
-                },
-                {
-                  display_name: "Product Title",
-                  variable_name: "product_title",
-                  value: productTitle || ''
-                },
-                {
-                  display_name: "Size",
-                  variable_name: "product_size",
-                  value: currentSize
-                },
-                {
-                  display_name: "Frame",
-                  variable_name: "product_frame",
-                  value: currentFrame
-                }
-              ]
-            },
-            onSuccess: (transaction: any) => {
-              alert(`Payment successful! Transaction reference: ${transaction.reference}`);
-            },
-            onCancel: () => {
-              console.log('Payment cancelled');
-            }
-          });
+          const existingItemIndex = cart.findIndex((i: any) => i.id === item.id && i.size === item.size && i.frame === item.frame);
+          if (existingItemIndex > -1) {
+            cart[existingItemIndex].quantity += 1;
+          } else {
+            cart.push(item);
+          }
+
+          localStorage.setItem('cart', JSON.stringify(cart));
+          document.dispatchEvent(new CustomEvent('cart-updated'));
+
+          window.location.href = '/cart';
         });
       }
     });
