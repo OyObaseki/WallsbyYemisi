@@ -68,13 +68,26 @@ const isActive = (href: string) => {
     </div>
   </div>
 
-  <!-- Mobile Menu Dropdown -->
-  <div id="mobile-menu" class="hidden lg:hidden absolute top-full left-0 w-full bg-[#FCFBF8] border-b border-[#EBE6DC] shadow-sm">
-    <nav class="flex flex-col px-6 py-4 space-y-4">
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="lg:hidden fixed inset-0 z-40 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+  <!-- Mobile Menu Slide-out Panel -->
+  <div id="mobile-menu-panel" class="lg:hidden fixed top-0 right-0 h-full w-[80%] max-w-sm z-50 bg-[#FCFBF8] shadow-2xl flex flex-col translate-x-full transition-transform duration-300">
+    <div class="flex items-center justify-between px-6 py-6 border-b border-[#EBE6DC]">
+      <span class="text-xl font-bold tracking-tight text-[#2D2A26]">WallsbyYemisi</span>
+      <button id="mobile-close-btn" class="w-10 h-10 rounded-full bg-[#F5F2EA] flex items-center justify-center text-[#333333] hover:bg-[#EAE5D9] transition" aria-label="Close Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="flex flex-col px-6 py-8 space-y-6 overflow-y-auto">
       {menuItems.map((item) => (
         <a
           href={item.href}
-          class={`text-base font-medium transition-colors hover:text-[#D4AF37] ${isActive(item.href) ? 'text-[#D4AF37]' : 'text-[#333333]'}`}
+          class={`text-lg font-medium transition-colors hover:text-[#D4AF37] ${isActive(item.href) ? 'text-[#D4AF37]' : 'text-[#333333]'}`}
         >
           {item.label}
         </a>
@@ -86,12 +99,26 @@ const isActive = (href: string) => {
 <script>
   document.addEventListener('astro:page-load', () => {
     const btn = document.getElementById('mobile-menu-btn');
-    const menu = document.getElementById('mobile-menu');
+    const closeBtn = document.getElementById('mobile-close-btn');
+    const overlay = document.getElementById('mobile-menu-overlay');
+    const panel = document.getElementById('mobile-menu-panel');
 
-    if (btn && menu) {
-      btn.addEventListener('click', () => {
-        menu.classList.toggle('hidden');
-      });
-    }
+    const openMenu = () => {
+      if (panel && overlay) {
+        panel.classList.remove('translate-x-full');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+      }
+    };
+
+    const closeMenu = () => {
+      if (panel && overlay) {
+        panel.classList.add('translate-x-full');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+      }
+    };
+
+    if (btn) btn.addEventListener('click', openMenu);
+    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+    if (overlay) overlay.addEventListener('click', closeMenu);
   });
 </script>
