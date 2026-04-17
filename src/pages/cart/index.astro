@@ -26,9 +26,9 @@ import Header from '../../components/Header.astro';
         <a href="/" class="border-2 border-[#C59F58] text-[#C59F58] hover:bg-[#F5F2EA] px-8 py-3 rounded-full font-medium transition duration-300 text-center">
           Continue Shopping
         </a>
-        <a href="/payment" class="bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300 text-center">
+        <button id="checkout-btn" class="bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300 text-center">
           Checkout
-        </a>
+        </button>
       </div>
     </div>
 
@@ -161,6 +161,13 @@ import Header from '../../components/Header.astro';
           saveCart();
           renderCart();
         });
+      });
+    }
+
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener('click', () => {
+        window.location.href = '/payment';
       });
     }
 
