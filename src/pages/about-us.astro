@@ -1,16 +1,81 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+import { sanityClient } from '../lib/sanity';
+
+const faqs = await sanityClient.fetch(`*[_type == "faq"]`);
 ---
 
 <Layout>
   <!-- Header -->
   <Header />
 
-  <main class="container mx-auto px-4 py-16 min-h-[60vh] flex items-center justify-center">
-    <div class="text-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-[#2D2A26] mb-4 uppercase tracking-wider">About Us</h1>
-      <p class="text-[#A39E93] text-lg max-w-2xl mx-auto">Learn more about WallsbyYemisi and our passion for bringing beautiful art into your everyday environment.</p>
+  <main class="container mx-auto px-4 py-16 min-h-[60vh]">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-[#2D2A26] mb-8 uppercase tracking-wider">ABOUT US</h1>
+      </div>
+
+      <div class="prose prose-lg mx-auto text-[#A39E93] leading-relaxed space-y-6">
+        <p>
+          At Walls by Yemisi, we believe that a space is more than just four boundaries—it is a canvas for your life, your brand, and your journey. We don't just decorate environments; we curate them.
+        </p>
+        <p>
+          Founded on the principle that every room should speak, our mission is to blend artistic intentionality with modern design. From bespoke accent walls to immersive content backdrops, we help you transition from a standard space to an inspired one. Whether you are looking to elevate your home or create a high-impact environment for your professional brand, we bring the vision to life with precision and soul.
+        </p>
+        <p class="font-medium text-[#2D2A26]">
+          Your walls are talking. We just make sure they have something beautiful to say.
+        </p>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="mt-20">
+        <h2 class="text-3xl font-bold text-[#2D2A26] mb-8 text-center uppercase tracking-wider">Frequently Asked Questions</h2>
+
+        <div class="space-y-4">
+          {faqs.map((faq: any) => (
+            <div class="border-b border-[#E5E5E5] pb-4">
+              <button class="w-full text-left flex justify-between items-center py-4 focus:outline-none faq-button">
+                <span class="text-lg font-medium text-[#2D2A26]">{faq.question}</span>
+                <span class="text-2xl text-[#A39E93] faq-icon transition-transform duration-200">+</span>
+              </button>
+              <div class="faq-answer hidden overflow-hidden text-[#A39E93] mt-2">
+                <p>{faq.answer}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   </main>
+
+  <script lang="ts">
+    function initFAQ() {
+      const buttons = document.querySelectorAll('.faq-button');
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          const answer = button.nextElementSibling;
+          const icon = button.querySelector('.faq-icon');
+
+          if (answer && icon) {
+            // Toggle answer visibility
+            answer.classList.toggle('hidden');
+
+            // Update icon and rotation
+            if (answer.classList.contains('hidden')) {
+              icon.textContent = '+';
+              icon.classList.remove('rotate-45');
+            } else {
+              icon.textContent = '+'; // keep it + but rotate to look like x
+              icon.classList.add('rotate-45');
+            }
+          }
+        });
+      });
+    }
+
+    // Run on initial load and after view transitions
+    document.addEventListener('astro:page-load', initFAQ);
+  </script>
 </Layout>
