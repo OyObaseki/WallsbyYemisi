@@ -1,0 +1,60 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+
+const categories = [
+  {
+    title: "Restaurant & Food Design Catalogue",
+    description: "Appetizing and vibrant designs perfect for dining spaces, cafes, and food establishments.",
+    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "Health & Fitness Design Catalogue",
+    description: "Energizing and motivational artwork to inspire movement in gyms and wellness centers.",
+    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "Brand & Commercial Spaces Design Catalogue",
+    description: "Professional, identity-driven visuals tailored for corporate environments and offices.",
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "Retail, Saloon & Fashion Design Catalogue",
+    description: "Chic and trendy murals designed to elevate the aesthetic of boutiques and salons.",
+    image: "https://images.unsplash.com/photo-1562157873-818bc0726f68?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    title: "Medical Healthcare Design Catalogue",
+    description: "Calming and comforting artistic designs suited for clinics, hospitals, and care facilities.",
+    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+  }
+];
+---
+
+<Layout>
+  <Header />
+
+  <main class="container mx-auto px-4 py-16 min-h-[60vh]">
+    <div class="text-center mb-16">
+      <h1 class="text-4xl md:text-5xl font-bold text-[#2D2A26] mb-4 uppercase tracking-wider">Mural Catalog</h1>
+      <p class="text-[#A39E93] text-lg max-w-2xl mx-auto">Browse our diverse mural categories designed for various spaces. Find the perfect aesthetic before requesting a quote.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {categories.map((category) => (
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col group hover:shadow-md transition-shadow duration-300">
+          <div class="h-64 overflow-hidden relative">
+            <img src={category.image} alt={category.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          </div>
+          <div class="p-6 flex flex-col flex-grow">
+            <h2 class="text-xl font-bold text-[#2D2A26] mb-3">{category.title}</h2>
+            <p class="text-[#A39E93] mb-6 flex-grow">{category.description}</p>
+            <a href="/schedule-inspection" class="inline-block w-full text-center bg-transparent border border-[#2D2A26] text-[#2D2A26] hover:bg-[#2D2A26] hover:text-white font-medium py-3 px-6 rounded transition-colors duration-300 uppercase tracking-wider text-sm mt-auto">
+              View Details
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </main>
+</Layout>
