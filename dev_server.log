@@ -14,3 +14,6 @@
 10:54:49 [vite] ✨ optimized dependencies changed. reloading
 10:54:54 [200] /product/0f8893e8-18c1-4556-a26c-a1cf7f011b69 77ms
 10:54:54 [200] /product/0f8893e8-18c1-4556-a26c-a1cf7f011b69 5ms
+12:54:48 [200] /frame-catalog 593ms
+12:54:55 [200] /product/0f8893e8-18c1-4556-a26c-a1cf7f011b69 9ms
+12:54:55 [200] /product/0f8893e8-18c1-4556-a26c-a1cf7f011b69 15ms
