@@ -63,7 +63,7 @@ if (!catalogueData) {
         "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
       ],
-      pdfUrl: "#" // Placeholder for PDF URL
+      pdfUrl: null
     },
     'monochrome-series': {
       title: "Monochrome Series",
@@ -73,7 +73,7 @@ if (!catalogueData) {
         "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
       ],
-      pdfUrl: "#" // Placeholder for PDF URL
+      pdfUrl: null
     }
   };
 
@@ -115,10 +115,9 @@ if (!catalogueData) {
     </section>
 
     <!-- SECTION 3 — Below Image Grid -->
-    <section class="text-center py-8">
-      <h3 class="text-2xl font-bold text-[#2D2A26] mb-6">View more of this catalogue</h3>
-
-      {catalogueData.pdfUrl ? (
+    {catalogueData.pdfUrl && (
+      <section class="text-center py-8">
+        <h3 class="text-2xl font-bold text-[#2D2A26] mb-6">View more of this catalogue</h3>
         <a
           href={catalogueData.pdfUrl}
           target="_blank"
@@ -127,15 +126,8 @@ if (!catalogueData) {
         >
           View Full Catalogue (PDF)
         </a>
-      ) : (
-        <button
-          disabled
-          class="inline-flex items-center justify-center bg-gray-300 text-gray-500 font-medium py-4 px-8 rounded-full cursor-not-allowed uppercase tracking-wider text-sm"
-        >
-          PDF Not Available
-        </button>
-      )}
-    </section>
+      </section>
+    )}
 
   </main>
 
