@@ -1,0 +1,261 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import { sanityClient } from '../../lib/sanity';
+
+export async function getStaticPaths() {
+  let paths = [];
+  try {
+    const catalogues = await sanityClient.fetch(`*[_type == "catalogue"]{
+      "slug": slug.current
+    }`);
+
+    if (catalogues && catalogues.length > 0) {
+      paths = catalogues.map((cat: any) => ({
+        params: { slug: cat.slug }
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching catalogue paths:", error);
+  }
+
+  // Always provide fallback paths for mock data
+  paths.push(
+    { params: { slug: 'spring-collection-2024' } },
+    { params: { slug: 'monochrome-series' } }
+  );
+
+  // Remove duplicates
+  const uniquePaths = Array.from(new Set(paths.map(p => p.params.slug)))
+    .map(slug => ({ params: { slug } }));
+
+  return uniquePaths;
+}
+
+const { slug } = Astro.params;
+
+let catalogueData: any = null;
+
+try {
+  catalogueData = await sanityClient.fetch(`*[_type == "catalogue" && slug.current == $slug][0]{
+    title,
+    description,
+    designsCount,
+    "images": images[].asset->url,
+    "pdfUrl": pdfUrl.asset->url
+  }`, { slug });
+} catch (error) {
+  console.error("Error fetching catalogue data:", error);
+}
+
+// Fallback mock data if CMS is empty or errors
+if (!catalogueData) {
+  const allMockCatalogues: any = {
+    'spring-collection-2024': {
+      title: "Spring Collection 2024",
+      description: "A vibrant exploration of new beginnings and colorful expressions. This collection features works that embrace the light and energy of the spring season.",
+      designsCount: 12,
+      images: [
+        "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      ],
+      pdfUrl: "#" // Placeholder for PDF URL
+    },
+    'monochrome-series': {
+      title: "Monochrome Series",
+      description: "A deep dive into shades of black, white, and gray. These pieces focus on texture and form over color.",
+      designsCount: 8,
+      images: [
+        "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      ],
+      pdfUrl: "#" // Placeholder for PDF URL
+    }
+  };
+
+  catalogueData = allMockCatalogues[slug as string] || allMockCatalogues['spring-collection-2024'];
+}
+---
+
+<Layout>
+  <Header />
+
+  <main class="container mx-auto px-4 py-16 min-h-[60vh] max-w-lg md:max-w-6xl">
+
+    <!-- SECTION 1 — Header -->
+    <section class="mb-16 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold text-[#2D2A26] mb-4 uppercase tracking-wider">{catalogueData.title}</h1>
+      <p class="text-[#A39E93] text-lg max-w-2xl mx-auto mb-4">{catalogueData.description}</p>
+      <div class="inline-block bg-[#F5F2EA] text-[#C59F58] px-4 py-2 rounded-full text-sm font-medium">
+        {catalogueData.designsCount} Designs Available
+      </div>
+    </section>
+
+    <!-- SECTION 2 — Image Grid -->
+    <section class="mb-16">
+      {catalogueData.images && catalogueData.images.length > 0 ? (
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          {catalogueData.images.map((imgSrc: string, index: number) => (
+            <div class="relative w-full aspect-square rounded-[20px] overflow-hidden bg-[#F5F2EA] group cursor-pointer" data-modal-trigger data-image-src={imgSrc}>
+              <img
+                src={imgSrc}
+                alt={`${catalogueData.title} - Image ${index + 1}`}
+                class="w-full h-full object-cover mix-blend-multiply transition-transform duration-500 group-hover:scale-110"
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="text-center text-gray-500 text-xl py-12">No images available for this catalogue.</p>
+      )}
+    </section>
+
+    <!-- SECTION 3 — Below Image Grid -->
+    <section class="text-center py-8">
+      <h3 class="text-2xl font-bold text-[#2D2A26] mb-6">View more of this catalogue</h3>
+
+      {catalogueData.pdfUrl ? (
+        <a
+          href={catalogueData.pdfUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center bg-[#2D2A26] text-white font-medium py-4 px-8 rounded-full hover:bg-[#C59F58] transition-colors duration-300 uppercase tracking-wider text-sm"
+        >
+          View Full Catalogue (PDF)
+        </a>
+      ) : (
+        <button
+          disabled
+          class="inline-flex items-center justify-center bg-gray-300 text-gray-500 font-medium py-4 px-8 rounded-full cursor-not-allowed uppercase tracking-wider text-sm"
+        >
+          PDF Not Available
+        </button>
+      )}
+    </section>
+
+  </main>
+
+  <!-- Image Modal -->
+  <div id="imageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 opacity-0 pointer-events-none transition-opacity duration-300">
+    <button id="closeModalBtn" class="absolute top-6 right-6 text-white hover:text-[#C59F58] transition-colors z-50">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <div class="relative w-full h-full p-4 md:p-12 flex items-center justify-center">
+      <img id="modalImage" src="" alt="Fullscreen view" class="max-w-full max-h-full object-contain drop-shadow-2xl scale-95 transition-transform duration-300" />
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-[#F3EFE6] px-8 py-12 rounded-t-[40px] mt-8">
+    <div class="max-w-lg md:max-w-4xl mx-auto">
+      <h2 class="text-3xl font-bold text-[#C59F58] mb-4">WallsbyYemisi</h2>
+      <p class="text-[#2D2A26] mb-8 max-w-sm leading-relaxed">Curating contemporary African art for modern spaces.</p>
+
+      <div class="mb-8">
+        <h3 class="text-[#D4AF37] text-sm font-bold tracking-widest uppercase mb-4">Contact Us</h3>
+        <div class="flex flex-col gap-4">
+          <a href="mailto:hello@wallsbyyemisi.com" class="flex items-center gap-3 text-[#2D2A26] hover:text-[#C59F58] transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
+            <span class="text-lg">hello@wallsbyyemisi.com</span>
+          </a>
+          <a href="tel:+1234567890" class="flex items-center gap-3 text-[#2D2A26] hover:text-[#C59F58] transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            <span class="text-lg">+1 (234) 567-890</span>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-[#D4AF37] text-sm font-bold tracking-widest uppercase mb-4">Follow Our Journey</h3>
+        <div class="flex gap-4">
+          <a href="#" class="w-12 h-12 rounded-[16px] bg-[#EAE5D9] flex items-center justify-center text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+            </svg>
+          </a>
+          <a href="#" class="w-12 h-12 rounded-[16px] bg-[#EAE5D9] flex items-center justify-center text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</Layout>
+
+<script lang="ts">
+  function setupModal() {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage') as HTMLImageElement;
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const triggers = document.querySelectorAll('[data-modal-trigger]');
+
+    if (!modal || !modalImage || !closeModalBtn) return;
+
+    // Open modal
+    triggers.forEach(trigger => {
+      trigger.addEventListener('click', (e) => {
+        const src = (e.currentTarget as HTMLElement).getAttribute('data-image-src');
+        if (src) {
+          modalImage.src = src;
+          modal.classList.remove('opacity-0', 'pointer-events-none');
+          // Add a slight delay for the zoom effect to happen after modal becomes visible
+          setTimeout(() => {
+            modalImage.classList.remove('scale-95');
+            modalImage.classList.add('scale-100');
+          }, 50);
+          document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+      });
+    });
+
+    // Close modal function
+    const closeModal = () => {
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      modalImage.classList.remove('scale-100');
+      modalImage.classList.add('scale-95');
+      document.body.style.overflow = ''; // Restore scrolling
+      // Optional: Clear src after animation completes to reset state
+      setTimeout(() => {
+        if (modal.classList.contains('opacity-0')) {
+          modalImage.src = '';
+        }
+      }, 300);
+    };
+
+    // Close on button click
+    closeModalBtn.addEventListener('click', closeModal);
+
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('opacity-0')) {
+        closeModal();
+      }
+    });
+  }
+
+  // Setup on initial load and subsequent navigations (View Transitions)
+  document.addEventListener('astro:page-load', setupModal);
+</script>
