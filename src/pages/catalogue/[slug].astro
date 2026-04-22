@@ -119,9 +119,7 @@ if (!catalogueData) {
       <section class="text-center py-8">
         <h3 class="text-2xl font-bold text-[#2D2A26] mb-6">View more of this catalogue</h3>
         <a
-          href={catalogueData.pdfUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={`/catalogue/${slug}/pdf`}
           class="inline-flex items-center justify-center bg-[#2D2A26] text-white font-medium py-4 px-8 rounded-full hover:bg-[#C59F58] transition-colors duration-300 uppercase tracking-wider text-sm"
         >
           View Full Catalogue (PDF)
@@ -130,7 +128,7 @@ if (!catalogueData) {
     )}
 
     <!-- SECTION 4 — Get Quote Form -->
-    <section class="mt-16 bg-[#F5F2EA] p-8 md:p-12 rounded-[32px]">
+    <section id="quote" class="mt-16 bg-[#F5F2EA] p-8 md:p-12 rounded-[32px]">
       <div class="max-w-3xl mx-auto">
         <div class="text-center mb-10">
           <h3 class="text-3xl font-bold text-[#2D2A26] mb-4">Get Quote</h3>
