@@ -1,34 +1,44 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+import { sanityClient } from '../lib/sanity';
 
-const categories = [
-  {
-    title: "Restaurant & Food Design Catalogue",
-    description: "Appetizing and vibrant designs perfect for dining spaces, cafes, and food establishments.",
-    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    title: "Health & Fitness Design Catalogue",
-    description: "Energizing and motivational artwork to inspire movement in gyms and wellness centers.",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    title: "Brand & Commercial Spaces Design Catalogue",
-    description: "Professional, identity-driven visuals tailored for corporate environments and offices.",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    title: "Retail, Saloon & Fashion Design Catalogue",
-    description: "Chic and trendy murals designed to elevate the aesthetic of boutiques and salons.",
-    image: "https://images.unsplash.com/photo-1562157873-818bc0726f68?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    title: "Medical Healthcare Design Catalogue",
-    description: "Calming and comforting artistic designs suited for clinics, hospitals, and care facilities.",
-    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-  }
-];
+let categories: any[] = [];
+
+try {
+  categories = await sanityClient.fetch(`*[_type == "catalogue"]{
+    title,
+    description,
+    "slug": slug.current,
+    "image": images[0].asset->url
+  }`);
+} catch (error) {
+  console.error("Error fetching catalogue data:", error);
+}
+
+// Fallback mock data if CMS is empty or errors
+if (!categories || categories.length === 0) {
+  categories = [
+    {
+      title: "Spring Collection 2024",
+      description: "A vibrant exploration of new beginnings and colorful expressions.",
+      slug: "spring-collection-2024",
+      image: "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      title: "Monochrome Series",
+      description: "A deep dive into shades of black, white, and gray.",
+      slug: "monochrome-series",
+      image: "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      title: "Natural & Landscape Design",
+      description: "Bring the outdoors in with stunning natural and landscape designs.",
+      slug: "natural-landscape-design",
+      image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    }
+  ];
+}
 ---
 
 <Layout>
@@ -49,8 +59,8 @@ const categories = [
           <div class="p-6 flex flex-col flex-grow">
             <h2 class="text-xl font-bold text-[#2D2A26] mb-3">{category.title}</h2>
             <p class="text-[#A39E93] mb-6 flex-grow">{category.description}</p>
-            <a href="/schedule-inspection" class="inline-block w-full text-center bg-transparent border border-[#2D2A26] text-[#2D2A26] hover:bg-[#2D2A26] hover:text-white font-medium py-3 px-6 rounded transition-colors duration-300 uppercase tracking-wider text-sm mt-auto">
-              View Details
+            <a href={`/catalogue/${category.slug}`} class="inline-block w-full text-center bg-transparent border border-[#2D2A26] text-[#2D2A26] hover:bg-[#2D2A26] hover:text-white font-medium py-3 px-6 rounded transition-colors duration-300 uppercase tracking-wider text-sm mt-auto">
+              View Catalogue
             </a>
           </div>
         </div>
