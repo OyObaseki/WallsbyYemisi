@@ -129,6 +129,84 @@ if (!catalogueData) {
       </section>
     )}
 
+    <!-- SECTION 4 — Get Quote Form -->
+    <section class="mt-16 bg-[#F5F2EA] p-8 md:p-12 rounded-[32px]">
+      <div class="max-w-3xl mx-auto">
+        <div class="text-center mb-10">
+          <h3 class="text-3xl font-bold text-[#2D2A26] mb-4">Get Quote</h3>
+          <p class="text-[#A39E93]">Interested in our designs? Request a custom quote below.</p>
+        </div>
+
+        <div id="quoteSuccessMessage" class="hidden bg-green-50 text-green-800 p-6 rounded-2xl text-center border border-green-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-green-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h4 class="text-xl font-bold mb-2">Thank you!</h4>
+          <p>We will contact you shortly with your quote.</p>
+        </div>
+
+        <form id="quoteForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="col-span-1 md:col-span-2">
+            <label for="fullName" class="block text-sm font-medium text-[#2D2A26] mb-2">Full Name</label>
+            <input type="text" id="fullName" name="fullName" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:border-[#C59F58] focus:ring-1 focus:ring-[#C59F58] bg-white transition-colors" />
+          </div>
+
+          <div>
+            <label for="phoneNumber" class="block text-sm font-medium text-[#2D2A26] mb-2">Phone Number</label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:border-[#C59F58] focus:ring-1 focus:ring-[#C59F58] bg-white transition-colors" />
+          </div>
+
+          <div>
+            <label for="emailAddress" class="block text-sm font-medium text-[#2D2A26] mb-2">Email Address</label>
+            <input type="email" id="emailAddress" name="emailAddress" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:border-[#C59F58] focus:ring-1 focus:ring-[#C59F58] bg-white transition-colors" />
+          </div>
+
+          <div>
+            <label for="location" class="block text-sm font-medium text-[#2D2A26] mb-2">Location (City)</label>
+            <input type="text" id="location" name="location" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:border-[#C59F58] focus:ring-1 focus:ring-[#C59F58] bg-white transition-colors" />
+          </div>
+
+          <div>
+            <label for="spaceType" class="block text-sm font-medium text-[#2D2A26] mb-2">Type of Space</label>
+            <select id="spaceType" name="spaceType" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:border-[#C59F58] focus:ring-1 focus:ring-[#C59F58] bg-white transition-colors appearance-none">
+              <option value="" disabled selected>Select a space type</option>
+              <option value="Restaurant & Food Design">Restaurant & Food Design</option>
+              <option value="Health & Fitness Design">Health & Fitness Design</option>
+              <option value="Brand & Commercial Spaces Design">Brand & Commercial Spaces Design</option>
+              <option value="Retail, Saloon & Fashion Design">Retail, Saloon & Fashion Design</option>
+              <option value="Natural & Landscape Design">Natural & Landscape Design</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="wallWidth" class="block text-sm font-medium text-[#2D2A26] mb-2">Wall Size (Width in Feet)</label>
+            <input type="number" id="wallWidth" name="wallWidth" min="0" step="0.1" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:border-[#C59F58] focus:ring-1 focus:ring-[#C59F58] bg-white transition-colors" />
+          </div>
+
+          <div>
+            <label for="wallHeight" class="block text-sm font-medium text-[#2D2A26] mb-2">Wall Size (Height in Feet)</label>
+            <input type="number" id="wallHeight" name="wallHeight" min="0" step="0.1" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:border-[#C59F58] focus:ring-1 focus:ring-[#C59F58] bg-white transition-colors" />
+          </div>
+
+          <div class="col-span-1 md:col-span-2">
+            <label for="projectDescription" class="block text-sm font-medium text-[#2D2A26] mb-2">Description of Project</label>
+            <textarea id="projectDescription" name="projectDescription" rows="4" required class="w-full border border-gray-300 rounded px-4 py-3 focus:outline-none focus:border-[#C59F58] focus:ring-1 focus:ring-[#C59F58] bg-white transition-colors"></textarea>
+          </div>
+
+          <div class="col-span-1 md:col-span-2">
+            <label for="referenceImage" class="block text-sm font-medium text-[#2D2A26] mb-2">Upload Reference Image (optional)</label>
+            <input type="file" id="referenceImage" name="referenceImage" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#EAE5D9] file:text-[#D4AF37] hover:file:bg-[#D4AF37] hover:file:text-white transition-colors cursor-pointer border border-gray-300 rounded px-4 py-2 bg-white" />
+          </div>
+
+          <div class="col-span-1 md:col-span-2 mt-4">
+            <button type="submit" class="w-full bg-[#2D2A26] text-white font-medium py-4 px-8 rounded-full hover:bg-[#C59F58] transition-colors duration-300 uppercase tracking-wider text-sm">
+              Request Quote
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
   </main>
 
   <!-- Image Modal -->
@@ -248,6 +326,22 @@ if (!catalogueData) {
     });
   }
 
+  function setupQuoteForm() {
+    const quoteForm = document.getElementById('quoteForm') as HTMLFormElement;
+    const quoteSuccessMessage = document.getElementById('quoteSuccessMessage');
+
+    if (quoteForm && quoteSuccessMessage) {
+      quoteForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        quoteForm.classList.add('hidden');
+        quoteSuccessMessage.classList.remove('hidden');
+      });
+    }
+  }
+
   // Setup on initial load and subsequent navigations (View Transitions)
-  document.addEventListener('astro:page-load', setupModal);
+  document.addEventListener('astro:page-load', () => {
+    setupModal();
+    setupQuoteForm();
+  });
 </script>

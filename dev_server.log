@@ -3,20 +3,20 @@
 > astro dev
 
 [vite] connected.
-07:46:53 [types] Generated 1ms
-07:46:53 [WARN] [content] Content config not loaded
-07:46:53 [vite] Re-optimizing dependencies because vite config has changed
- astro  v6.0.5 ready in 1694 ms
+11:48:40 [types] Generated 1ms
+11:48:40 [WARN] [content] Content config not loaded
+11:48:40 [vite] Re-optimizing dependencies because vite config has changed
+ astro  v6.0.5 ready in 1508 ms
 ┃ Local    http://localhost:4321/
 ┃ Network  use --host to expose
-07:46:53 watching for file changes...
+11:48:40 watching for file changes...
 
  update  ▶ New version of Astro available: 6.1.8
   Run npx @astrojs/upgrade to update
 
-07:49:21 [200] /mural-catalog 122ms
-07:49:22 [vite] ✨ new dependencies optimized: astro/runtime/client/dev-toolbar/entrypoint.js, astro/virtual-modules/transitions-router.js, astro/virtual-modules/transitions-types.js, astro/virtual-modules/transitions-events.js, astro/virtual-modules/transitions-swap-functions.js
-07:49:22 [vite] ✨ optimized dependencies changed. reloading
-07:49:24 [200] /schedule-inspection 48ms
-07:49:24 [200] /schedule-inspection 4ms
-07:55:57 [200] /mural-catalog 10ms
+11:49:16 [200] /catalogue/spring-collection-2024 223ms
+11:49:16 [vite] ✨ new dependencies optimized: astro/runtime/client/dev-toolbar/entrypoint.js, astro/virtual-modules/transitions-router.js, astro/virtual-modules/transitions-types.js, astro/virtual-modules/transitions-events.js, astro/virtual-modules/transitions-swap-functions.js
+11:49:16 [vite] ✨ optimized dependencies changed. reloading
+11:49:25 [200] /catalogue/spring-collection-2024 139ms
+11:49:58 [200] /catalogue/spring-collection-2024 138ms
+11:50:05 [200] /catalogue/spring-collection-2024 133ms
