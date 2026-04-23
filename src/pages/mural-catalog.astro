@@ -6,11 +6,11 @@ import { sanityClient } from '../lib/sanity';
 let categories: any[] = [];
 
 try {
-  categories = await sanityClient.fetch(`*[_type == "catalogue"]{
+  categories = await sanityClient.fetch(`*[_type == "catalogue"] | order(displayOrder asc) {
     title,
     description,
     "slug": slug.current,
-    "image": images[0].asset->url
+    "image": coalesce(coverImage.asset->url, images[0].asset->url)
   }`);
 } catch (error) {
   console.error("Error fetching catalogue data:", error);
@@ -23,21 +23,26 @@ if (!categories || categories.length === 0) {
       title: "Spring Collection 2024",
       description: "A vibrant exploration of new beginnings and colorful expressions.",
       slug: "spring-collection-2024",
-      image: "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      image: "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      displayOrder: 1
     },
     {
       title: "Monochrome Series",
       description: "A deep dive into shades of black, white, and gray.",
       slug: "monochrome-series",
-      image: "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      image: "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      displayOrder: 2
     },
     {
       title: "Natural & Landscape Design",
       description: "Bring the outdoors in with stunning natural and landscape designs.",
       slug: "natural-landscape-design",
-      image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      displayOrder: 3
     }
   ];
+
+  categories.sort((a, b) => a.displayOrder - b.displayOrder);
 }
 ---
 

@@ -7,7 +7,7 @@ export const catalogue = defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Catalogue Title',
       type: 'string',
     }),
     defineField({
@@ -20,14 +20,15 @@ export const catalogue = defineType({
       },
     }),
     defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
+      name: 'coverImage',
+      title: 'Catalogue Cover Image',
+      type: 'image',
+      options: { hotspot: true },
     }),
     defineField({
-      name: 'designsCount',
-      title: 'Number of Designs Available',
-      type: 'number',
+      name: 'description',
+      title: 'Short Description',
+      type: 'text',
     }),
     defineField({
       name: 'images',
@@ -37,11 +38,16 @@ export const catalogue = defineType({
     }),
     defineField({
       name: 'pdfUrl',
-      title: 'PDF File',
+      title: 'Full Catalogue PDF',
       type: 'file',
       options: {
         accept: 'application/pdf',
       },
+    }),
+    defineField({
+      name: 'displayOrder',
+      title: 'Display Order',
+      type: 'number',
     }),
   ],
 })
