@@ -55,6 +55,50 @@ import { ClientRouter } from 'astro:transitions';
 
 			// Listen for custom event
 			document.addEventListener('cart-updated', updateCartBadge);
+
+			// Mobile Swipe-Back Navigation Logic
+			function setupSwipeBack() {
+				let touchstartX = 0;
+				let touchstartY = 0;
+				let touchendX = 0;
+				let touchendY = 0;
+				const SWIPE_THRESHOLD = 50;
+				const EDGE_THRESHOLD = 30; // pixels from left edge
+
+				document.addEventListener('touchstart', e => {
+					touchstartX = e.changedTouches[0].screenX;
+					touchstartY = e.changedTouches[0].screenY;
+				}, { passive: true });
+
+				document.addEventListener('touchend', e => {
+					touchendX = e.changedTouches[0].screenX;
+					touchendY = e.changedTouches[0].screenY;
+					handleSwipe();
+				}, { passive: true });
+
+				function handleSwipe() {
+					// Check if swipe started from the left edge
+					if (touchstartX > EDGE_THRESHOLD) return;
+
+					const diffX = touchendX - touchstartX;
+					const diffY = Math.abs(touchendY - touchstartY);
+
+					// Ensure it's mostly horizontal swipe and meets distance threshold
+					if (diffX > SWIPE_THRESHOLD && diffY < diffX) {
+						// Execute swipe back logic
+						// Consider it's "no previous page" if history length is 1 or less
+						if (window.history.length > 1) {
+							window.history.back();
+						} else {
+							// Redirect to /shop-mural as a fallback
+							window.location.href = '/shop-mural';
+						}
+					}
+				}
+			}
+
+			// Initialize swipe back logic
+			setupSwipeBack();
 		</script>
 	</body>
 </html>
