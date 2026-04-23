@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+import BackButton from '../components/BackButton.astro';
 import { sanityClient } from '../lib/sanity';
 
 let products: any[] = [];
@@ -98,6 +99,7 @@ const processedProducts = products.map(product => {
 ---
 
 <Layout>
+  <BackButton />
   <!-- Header -->
   <Header />
 

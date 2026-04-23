@@ -1,7 +1,6 @@
 ---
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
-import BackButton from '../components/BackButton.astro';
 ---
 
 <!doctype html>
@@ -19,7 +18,6 @@ import BackButton from '../components/BackButton.astro';
 		<ClientRouter />
 	</head>
 	<body class="bg-[#FCFBF8] text-[#333333] font-['Plus_Jakarta_Sans',_sans-serif]">
-		<BackButton />
 		<slot />
 
 		<script lang="ts">

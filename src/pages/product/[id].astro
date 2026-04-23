@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
+import BackButton from '../../components/BackButton.astro';
 import { sanityClient } from '../../lib/sanity';
 
 export async function getStaticPaths() {
@@ -102,6 +103,7 @@ if (product.variants && Array.isArray(product.variants)) {
 ---
 
 <Layout>
+  <BackButton />
   <!-- Header -->
   <Header />
 

@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
+import BackButton from '../../components/BackButton.astro';
 import { sanityClient } from '../../lib/sanity';
 
 export async function getStaticPaths() {
@@ -82,6 +83,7 @@ if (!catalogueData) {
 ---
 
 <Layout>
+  <BackButton />
   <Header />
 
   <main class="container mx-auto px-4 py-16 min-h-[60vh] max-w-lg md:max-w-6xl">
