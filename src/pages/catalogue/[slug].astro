@@ -63,7 +63,7 @@ if (!catalogueData) {
         "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
       ],
-      pdfUrl: null
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
     },
     'monochrome-series': {
       title: "Monochrome Series",
@@ -73,7 +73,7 @@ if (!catalogueData) {
         "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
       ],
-      pdfUrl: null
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
     }
   };
 
@@ -119,9 +119,7 @@ if (!catalogueData) {
       <section class="text-center py-8">
         <h3 class="text-2xl font-bold text-[#2D2A26] mb-6">View more of this catalogue</h3>
         <a
-          href={catalogueData.pdfUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={`/catalogue/${slug}/pdf`}
           class="inline-flex items-center justify-center bg-[#2D2A26] text-white font-medium py-4 px-8 rounded-full hover:bg-[#C59F58] transition-colors duration-300 uppercase tracking-wider text-sm"
         >
           View Full Catalogue (PDF)
@@ -130,7 +128,7 @@ if (!catalogueData) {
     )}
 
     <!-- SECTION 4 — Get Quote Form -->
-    <section class="mt-16 bg-[#F5F2EA] p-8 md:p-12 rounded-[32px]">
+    <section id="quote" class="mt-16 bg-[#F5F2EA] p-8 md:p-12 rounded-[32px]">
       <div class="max-w-3xl mx-auto">
         <div class="text-center mb-10">
           <h3 class="text-3xl font-bold text-[#2D2A26] mb-4">Get Quote</h3>
