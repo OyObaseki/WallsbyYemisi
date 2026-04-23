@@ -38,6 +38,7 @@ let catalogueData: any = null;
 
 try {
   catalogueData = await sanityClient.fetch(`*[_type == "catalogue" && slug.current == $slug][0]{
+    title,
     "pdfUrl": pdfUrl.asset->url
   }`, { slug });
 } catch (error) {
@@ -48,9 +49,11 @@ try {
 if (!catalogueData) {
   const allMockCatalogues: any = {
     'spring-collection-2024': {
+      title: "Spring Collection 2024",
       pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
     },
     'monochrome-series': {
+      title: "Monochrome Series",
       pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
     }
   };
@@ -60,7 +63,7 @@ if (!catalogueData) {
 ---
 
 <Layout>
-  <BackButton />
+  <BackButton title={catalogueData?.title} />
   <main class="h-screen w-full flex flex-col bg-[#F5F2EA]">
     <!-- Header with Back Button -->
     <header class="flex items-center px-4 py-4 md:px-8 shadow-sm bg-white shrink-0">

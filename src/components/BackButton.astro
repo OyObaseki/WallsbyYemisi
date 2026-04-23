@@ -1,13 +1,19 @@
 ---
+interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props;
 ---
 
 <button
   id="global-back-button"
-  class="hidden md:flex fixed top-4 left-4 z-[100] text-3xl font-bold p-[12px] rounded-lg bg-transparent hover:bg-black/5 text-[#2D2A26] hover:text-[#C59F58] transition-colors items-center justify-center cursor-pointer select-none"
+  class="hidden md:flex fixed top-4 left-4 z-[100] p-[12px] rounded-lg bg-transparent hover:bg-black/5 text-[#2D2A26] hover:text-[#C59F58] transition-colors items-center gap-2 cursor-pointer select-none"
   aria-label="Go Back"
   title="Go Back"
 >
-  &lt;
+  <span class="text-3xl font-bold leading-none">&lt;</span>
+  {title && <span class="font-medium text-lg leading-none">{title}</span>}
 </button>
 
 <script lang="ts">
