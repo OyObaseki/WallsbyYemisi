@@ -1,0 +1,33 @@
+---
+---
+
+<button
+  id="global-back-button"
+  class="hidden md:flex fixed top-4 left-4 z-[100] text-3xl font-bold p-[12px] rounded-lg bg-transparent hover:bg-black/5 text-[#2D2A26] hover:text-[#C59F58] transition-colors items-center justify-center cursor-pointer select-none"
+  aria-label="Go Back"
+  title="Go Back"
+>
+  &lt;
+</button>
+
+<script lang="ts">
+  function setupBackButton() {
+    const btn = document.getElementById('global-back-button');
+    if (!btn) return;
+
+    // Remove existing listener to avoid duplicates on view transition
+    const newBtn = btn.cloneNode(true) as HTMLElement;
+    btn.parentNode?.replaceChild(newBtn, btn);
+
+    newBtn.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/shop-mural';
+      }
+    });
+  }
+
+  // Run on initial load and View Transition navigation
+  document.addEventListener('astro:page-load', setupBackButton);
+</script>
