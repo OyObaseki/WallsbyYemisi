@@ -40,7 +40,6 @@ try {
   catalogueData = await sanityClient.fetch(`*[_type == "catalogue" && slug.current == $slug][0]{
     title,
     description,
-    designsCount,
     "images": images[].asset->url,
     "pdfUrl": pdfUrl.asset->url
   }`, { slug });
@@ -54,7 +53,6 @@ if (!catalogueData) {
     'spring-collection-2024': {
       title: "Spring Collection 2024",
       description: "A vibrant exploration of new beginnings and colorful expressions. This collection features works that embrace the light and energy of the spring season.",
-      designsCount: 12,
       images: [
         "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -68,7 +66,6 @@ if (!catalogueData) {
     'monochrome-series': {
       title: "Monochrome Series",
       description: "A deep dive into shades of black, white, and gray. These pieces focus on texture and form over color.",
-      designsCount: 8,
       images: [
         "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
@@ -91,7 +88,7 @@ if (!catalogueData) {
       <h1 class="text-4xl md:text-5xl font-bold text-[#2D2A26] mb-4 uppercase tracking-wider">{catalogueData.title}</h1>
       <p class="text-[#A39E93] text-lg max-w-2xl mx-auto mb-4">{catalogueData.description}</p>
       <div class="inline-block bg-[#F5F2EA] text-[#C59F58] px-4 py-2 rounded-full text-sm font-medium">
-        {catalogueData.designsCount} Designs Available
+        {catalogueData.images ? catalogueData.images.length : 0} Designs Available
       </div>
     </section>
 
