@@ -90,6 +90,42 @@ if (!heroSlides || heroSlides.length === 0) {
   ];
 }
 
+let collections: any[] = [];
+try {
+  collections = await sanityClient.fetch(`*[_type == "collection"]{
+    title,
+    "slug": slug.current,
+    "imageUrl": image.asset->url
+  }`);
+} catch (error) {
+  console.error("Error fetching collections from Sanity:", error);
+}
+
+if (!collections || collections.length === 0) {
+  collections = [
+    {
+      title: "Monochrome",
+      slug: "monochrome",
+      imageUrl: "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      title: "Azure Deep",
+      slug: "azure-deep",
+      imageUrl: "https://images.unsplash.com/photo-1580136608260-4eb11f4b24fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      title: "Velvet Night",
+      slug: "velvet-night",
+      imageUrl: "https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      title: "Terra Cotta",
+      slug: "terra-cotta",
+      imageUrl: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    }
+  ];
+}
+
 ---
 
 <Layout>
@@ -254,37 +290,14 @@ if (!heroSlides || heroSlides.length === 0) {
       </div>
 
       <div class="grid grid-cols-2 gap-4">
-        <!-- Collection 1 -->
-        <a href="/collections/monochrome" class="flex flex-col group transition hover:-translate-y-1">
-          <div class="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden mb-3 border-[6px] border-white shadow-sm">
-            <img src="https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Monochrome Collection" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" />
-          </div>
-          <h3 class="font-bold text-[#2D2A26] text-center text-lg" transition:name="collection-title-monochrome">Monochrome</h3>
-        </a>
-
-        <!-- Collection 2 -->
-        <a href="/collections/azure-deep" class="flex flex-col group transition hover:-translate-y-1">
-          <div class="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden mb-3 border-[6px] border-white shadow-sm">
-            <img src="https://images.unsplash.com/photo-1580136608260-4eb11f4b24fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Azure Deep Collection" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" />
-          </div>
-          <h3 class="font-bold text-[#2D2A26] text-center text-lg" transition:name="collection-title-azure-deep">Azure Deep</h3>
-        </a>
-
-        <!-- Collection 3 -->
-        <a href="/collections/velvet-night" class="flex flex-col group transition hover:-translate-y-1">
-          <div class="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden mb-3 border-[6px] border-white shadow-sm">
-            <img src="https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Velvet Night Collection" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" />
-          </div>
-          <h3 class="font-bold text-[#2D2A26] text-center text-lg" transition:name="collection-title-velvet-night">Velvet Night</h3>
-        </a>
-
-        <!-- Collection 4 -->
-        <a href="/collections/terra-cotta" class="flex flex-col group transition hover:-translate-y-1">
-          <div class="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden mb-3 border-[6px] border-white shadow-sm">
-            <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Terra Cotta Collection" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" />
-          </div>
-          <h3 class="font-bold text-[#2D2A26] text-center text-lg" transition:name="collection-title-terra-cotta">Terra Cotta</h3>
-        </a>
+        {collections.map((collection) => (
+          <a href={`/collections/${collection.slug}`} class="flex flex-col group transition hover:-translate-y-1">
+            <div class="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden mb-3 border-[6px] border-white shadow-sm">
+              <img src={collection.imageUrl} alt={`${collection.title} Collection`} class="w-full h-full object-cover transition duration-500 group-hover:scale-105" />
+            </div>
+            <h3 class="font-bold text-[#2D2A26] text-center text-lg" transition:name={`collection-title-${collection.slug}`}>{collection.title}</h3>
+          </a>
+        ))}
       </div>
     </section>
 
