@@ -50,4 +50,10 @@ export const catalogue = defineType({
       type: 'number',
     }),
   ],
+  preview: {
+    select: {
+      title: 'title',
+      media: 'coverImage',
+    },
+  },
 })
