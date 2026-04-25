@@ -1,16 +1,193 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+import { sanityClient } from '../lib/sanity';
+
+let products: any[] = [];
+try {
+  products = await sanityClient.fetch(`*[_type == "product"]{
+    _id,
+    title,
+    "description": pt::text(description),
+    "imageUrl": featuredImage.asset->url,
+    variants
+  }`);
+} catch (error) {
+  console.error("Error fetching products from Sanity:", error);
+}
+
+// Fallback mock data if CMS is empty or errors
+if (!products || products.length === 0) {
+  products = [
+    {
+      _id: "mock-1",
+      title: "Queen of Orisun",
+      description: "Original Canvas",
+      imageUrl: "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      variants: [
+        { title: "24x36 frameless", price: 75000 },
+        { title: "30x40 frameless", price: 95000 }
+      ]
+    },
+    {
+      _id: "mock-2",
+      title: "Night Bloom",
+      description: "Art Print",
+      imageUrl: "https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      variants: [
+        { title: "24x36 frameless", price: 65000 }
+      ]
+    },
+    {
+      _id: "mock-3",
+      title: "Golden Hour",
+      description: "Mixed Media",
+      imageUrl: "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      variants: []
+    },
+    {
+      _id: "mock-4",
+      title: "Azure Deep",
+      description: "Original Canvas",
+      imageUrl: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      variants: [
+        { title: "24x36 framed", price: 85000 }
+      ]
+    }
+  ];
+}
+
+// Format currency
+const formatNaira = (amount: number) => {
+  return new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: 'NGN',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
+// Process products for display
+const processedProducts = products.map(product => {
+  let minPrice = 0;
+  let sizes: string[] = [];
+
+  if (product.variants && Array.isArray(product.variants) && product.variants.length > 0) {
+    minPrice = Math.min(...product.variants.map((v: any) => v.price || 0));
+
+    // Extract sizes from variant titles (e.g. "24x36 frameless" -> "24x36")
+    const extractedSizes = product.variants.map((v: any) => {
+      const parts = v.title ? v.title.split(' ') : [];
+      return parts[0] || '';
+    }).filter(Boolean);
+
+    // Deduplicate sizes
+    sizes = [...new Set(extractedSizes)];
+  } else {
+    // Default fallback if no variants
+    minPrice = 75000;
+  }
+
+  return {
+    ...product,
+    minPrice,
+    sizesPreview: sizes.length > 0 ? sizes.join(', ') : 'Various sizes'
+  };
+});
+
 ---
 
 <Layout>
   <!-- Header -->
   <Header />
 
-  <main class="container mx-auto px-4 py-16 min-h-[60vh] flex items-center justify-center">
-    <div class="text-center">
+  <main class="container mx-auto px-4 py-16 min-h-[60vh] max-w-lg md:max-w-6xl">
+    <div class="text-center mb-16">
       <h1 class="text-4xl md:text-5xl font-bold text-[#2D2A26] mb-4 uppercase tracking-wider">New Arrivals</h1>
       <p class="text-[#A39E93] text-lg max-w-2xl mx-auto">Discover our latest collection of premium mural wall art. Check back soon for exciting new additions.</p>
     </div>
+
+    {processedProducts.length === 0 ? (
+      <p class="text-center text-gray-500 text-xl py-12">No new arrivals currently available.</p>
+    ) : (
+      <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
+        {processedProducts.map((product) => (
+          <a href={`/product/${product._id}`} class="block transition hover:-translate-y-1 h-full">
+            <div class="bg-[#FDFBF7] rounded-[24px] p-2 flex flex-col shadow-sm border border-[#F3EFE6] h-full group hover:shadow-md transition-shadow duration-300">
+              <div class="relative w-full aspect-square rounded-[20px] overflow-hidden mb-3 bg-[#F5F2EA]">
+                <img src={product.imageUrl} alt={product.title} class="w-full h-full object-cover mix-blend-multiply transition-transform duration-500 group-hover:scale-105" />
+              </div>
+              <div class="px-2 pb-2 flex flex-col flex-grow">
+                <h3 class="font-bold text-[#2D2A26] text-sm md:text-base leading-tight mb-1">{product.title}</h3>
+
+                <div class="text-[#A39E93] text-xs mb-3 flex-grow flex flex-col gap-1">
+                  <span class="truncate">Sizes: {product.sizesPreview}</span>
+                </div>
+
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mt-auto">
+                  <span class="text-[#C59F58] font-bold text-sm md:text-base">From {formatNaira(product.minPrice)}</span>
+
+                  <div class="w-full md:hidden text-center bg-transparent border border-[#2D2A26] text-[#2D2A26] group-hover:bg-[#2D2A26] group-hover:text-white font-medium py-2 px-4 rounded transition-colors duration-300 uppercase tracking-wider text-xs">
+                    View Product
+                  </div>
+
+                  <div class="hidden md:flex w-8 h-8 shrink-0 rounded-full bg-[#F5F2EA] items-center justify-center text-[#C59F58] group-hover:bg-[#EAE5D9] transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="12" x2="12" y1="5" y2="19"></line>
+                      <line x1="5" x2="19" y1="12" y2="12"></line>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
   </main>
+
+  <!-- Footer -->
+  <footer class="bg-[#F3EFE6] px-8 py-12 rounded-t-[40px] mt-8">
+    <div class="max-w-lg md:max-w-4xl mx-auto">
+      <h2 class="text-3xl font-bold text-[#C59F58] mb-4">WallsbyYemisi</h2>
+      <p class="text-[#2D2A26] mb-8 max-w-sm leading-relaxed">Curating contemporary African art for modern spaces.</p>
+
+      <div class="mb-8">
+        <h3 class="text-[#D4AF37] text-sm font-bold tracking-widest uppercase mb-4">Contact Us</h3>
+        <div class="flex flex-col gap-4">
+          <a href="mailto:hello@wallsbyyemisi.com" class="flex items-center gap-3 text-[#2D2A26] hover:text-[#C59F58] transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
+            <span class="text-lg">hello@wallsbyyemisi.com</span>
+          </a>
+          <a href="tel:+1234567890" class="flex items-center gap-3 text-[#2D2A26] hover:text-[#C59F58] transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            <span class="text-lg">+1 (234) 567-890</span>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-[#D4AF37] text-sm font-bold tracking-widest uppercase mb-4">Follow Our Journey</h3>
+        <div class="flex gap-4">
+          <a href="#" class="w-12 h-12 rounded-[16px] bg-[#EAE5D9] flex items-center justify-center text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+            </svg>
+          </a>
+          <a href="#" class="w-12 h-12 rounded-[16px] bg-[#EAE5D9] flex items-center justify-center text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </Layout>
