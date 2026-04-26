@@ -5,10 +5,15 @@ import { sanityClient } from '../lib/sanity';
 
 // Fetch FAQs
 let faqs = [];
+let aboutUsContent = "";
 try {
   faqs = await sanityClient.fetch(`*[_type == "faq"]`);
+  const aboutUsData = await sanityClient.fetch(`*[_type == "aboutUs"][0]{"content": pt::text(content)}`);
+  if (aboutUsData && aboutUsData.content) {
+    aboutUsContent = aboutUsData.content;
+  }
 } catch (error) {
-  console.error("Failed to fetch FAQs", error);
+  console.error("Failed to fetch from Sanity", error);
 }
 
 // Fallback mock data if fetch fails or returns empty array
@@ -19,6 +24,17 @@ if (!faqs || faqs.length === 0) {
     { question: "Do you offer custom designs?", answer: "Yes, we work closely with clients to create bespoke designs that match their vision and brand." }
   ];
 }
+
+if (!aboutUsContent) {
+  aboutUsContent = `At Walls by Yemisi, we believe that a space is more than just four boundaries—it is a canvas for your life, your brand, and your journey. We don't just decorate environments; we curate them.
+
+Founded on the principle that every room should speak, our mission is to blend artistic intentionality with modern design. From bespoke accent walls to immersive content backdrops, we help you transition from a standard space to an inspired one. Whether you are looking to elevate your home or create a high-impact environment for your professional brand, we bring the vision to life with precision and soul.
+
+Your walls are talking. We just make sure they have something beautiful to say.`;
+}
+
+// Split content by paragraphs
+const paragraphs = aboutUsContent.split('\n\n').filter(p => p.trim().length > 0);
 ---
 
 <Layout>
@@ -29,9 +45,9 @@ if (!faqs || faqs.length === 0) {
     <div class="text-center max-w-3xl mx-auto mb-24">
       <h1 class="text-4xl md:text-5xl font-bold text-[#2D2A26] mb-8 uppercase tracking-wider">ABOUT US</h1>
       <div class="text-[#666666] text-lg space-y-6">
-        <p>At Walls by Yemisi, we believe that a space is more than just four boundaries—it is a canvas for your life, your brand, and your journey. We don't just decorate environments; we curate them.</p>
-        <p>Founded on the principle that every room should speak, our mission is to blend artistic intentionality with modern design. From bespoke accent walls to immersive content backdrops, we help you transition from a standard space to an inspired one. Whether you are looking to elevate your home or create a high-impact environment for your professional brand, we bring the vision to life with precision and soul.</p>
-        <p>Your walls are talking. We just make sure they have something beautiful to say.</p>
+        {paragraphs.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
       </div>
     </div>
 
