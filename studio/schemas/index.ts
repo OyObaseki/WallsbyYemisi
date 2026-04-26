@@ -7,5 +7,6 @@ import { newArrivals } from './newArrivals'
 import { faq } from './faq'
 import { aboutUs } from './aboutUs'
 import { trending } from './trending'
+import { review } from './review'
 
-export const schemaTypes = [product, productVariant, catalogue, heroSlide, collection, newArrivals, faq, aboutUs, trending]
+export const schemaTypes = [product, productVariant, catalogue, heroSlide, collection, newArrivals, faq, aboutUs, trending, review]
