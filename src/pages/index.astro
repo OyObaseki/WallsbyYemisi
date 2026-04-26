@@ -182,6 +182,33 @@ if (!collections || collections.length === 0) {
   ];
 }
 
+let reviews: any[] = [];
+try {
+  reviews = await sanityClient.fetch(`*[_type == "review"]{
+    reviewerName,
+    reviewText
+  }`);
+} catch (error) {
+  console.error("Error fetching reviews from Sanity:", error);
+}
+
+if (!reviews || reviews.length === 0) {
+  reviews = [
+    {
+      reviewText: "Got the perfect Art piece last week",
+      reviewerName: "Anton Ede"
+    },
+    {
+      reviewText: "These guys sell the most beautiful art",
+      reviewerName: "Alexis N."
+    },
+    {
+      reviewText: "Got the perfect Art piece last week",
+      reviewerName: "John D."
+    }
+  ];
+}
+
 ---
 
 <Layout>
@@ -433,20 +460,12 @@ if (!collections || collections.length === 0) {
       </div>
 
       <div class="flex overflow-x-auto pb-4 gap-4 hide-scrollbar snap-x">
-        <div class="min-w-[280px] bg-[#FDFBF7] p-6 rounded-[24px] shadow-sm snap-center border border-[#F3EFE6]">
-          <p class="text-[#333333] mb-4 text-lg font-medium leading-tight">Got the perfect Art piece last week</p>
-          <p class="text-right font-bold text-[#2D2A26]">-Anton Ede</p>
-        </div>
-
-        <div class="min-w-[280px] bg-[#FDFBF7] p-6 rounded-[24px] shadow-sm snap-center border border-[#F3EFE6]">
-          <p class="text-[#333333] mb-4 text-lg font-medium leading-tight">These guys sell the most beautiful art</p>
-          <p class="text-right font-bold text-[#2D2A26]">-Alexis N.</p>
-        </div>
-
-        <div class="min-w-[280px] bg-[#FDFBF7] p-6 rounded-[24px] shadow-sm snap-center border border-[#F3EFE6]">
-          <p class="text-[#333333] mb-4 text-lg font-medium leading-tight">Got the perfect Art piece last week</p>
-          <p class="text-right font-bold text-[#2D2A26]">-John D.</p>
-        </div>
+        {reviews.map((review) => (
+          <div class="min-w-[280px] bg-[#FDFBF7] p-6 rounded-[24px] shadow-sm snap-center border border-[#F3EFE6]">
+            <p class="text-[#333333] mb-4 text-lg font-medium leading-tight">{review.reviewText}</p>
+            <p class="text-right font-bold text-[#2D2A26]">- {review.reviewerName}</p>
+          </div>
+        ))}
       </div>
     </section>
   </main>
