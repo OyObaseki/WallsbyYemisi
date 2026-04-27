@@ -147,7 +147,38 @@ if (!heroSlides || heroSlides.length === 0) {
   ];
 }
 
+
+// Enforce specific slide links and order
+let welcomeSlideIndex = heroSlides.findIndex((s: any) => s.heading && s.heading.includes('Welcome'));
+if (welcomeSlideIndex !== -1) {
+  const welcomeSlide = heroSlides.splice(welcomeSlideIndex, 1)[0];
+  heroSlides.unshift(welcomeSlide);
+}
+
+heroSlides.forEach((s: any) => {
+  if (s.heading && s.heading.includes('Welcome')) {
+    s.buttonText = 'Explore Collection';
+    s.buttonLink = '#collections';
+  } else if (s.heading && s.heading.includes('Frames')) {
+    s.buttonText = 'Shop Now';
+    s.buttonLink = '/frame-catalog';
+  } else if (s.heading && (s.heading.includes('Mural') || s.heading.includes('Get Customized Mural'))) {
+    s.buttonText = 'Shop Now';
+    s.buttonLink = '/mural-catalog';
+  }
+});
+
+let carouselSlides: any[] = [];
+if (heroSlides.length > 0) {
+  carouselSlides = [
+    heroSlides[heroSlides.length - 1],
+    ...heroSlides,
+    heroSlides[0]
+  ];
+}
+
 let collections: any[] = [];
+
 try {
   collections = await sanityClient.fetch(`*[_type == "collection"]{
     title,
@@ -222,7 +253,7 @@ if (!reviews || reviews.length === 0) {
       <div class="relative w-full h-[500px] rounded-[32px] overflow-hidden shadow-sm">
         <!-- Carousel Track -->
         <div id="hero-carousel-track" class="flex w-full h-full transition-transform duration-500 ease-in-out cursor-grab active:cursor-grabbing">
-          {heroSlides.map((slide) => (
+          {carouselSlides.map((slide) => (
             <div class="w-full h-full flex-shrink-0 relative">
               <img src={slide.imageUrl} alt={slide.heading} draggable="false" class="w-full h-full object-cover select-none pointer-events-none" />
               <!-- Gradient Overlay -->
@@ -498,13 +529,13 @@ if (!reviews || reviews.length === 0) {
       cleanupFunctions = [];
     });
 
-    document.addEventListener('astro:page-load', () => {
+        document.addEventListener('astro:page-load', () => {
       const track = document.getElementById('hero-carousel-track');
       const dots = document.querySelectorAll('.hero-dot');
       if (!track || dots.length === 0) return;
 
-      let currentIndex = 0;
-      const slideCount = dots.length;
+      let currentIndex = 1; // Start at 1 because 0 is the prepended clone
+      const totalSlides = dots.length;
       let startX = 0;
       let startY = 0;
       let currentTranslate = 0;
@@ -512,22 +543,42 @@ if (!reviews || reviews.length === 0) {
       let isDragging = false;
       let isScrolling = false;
 
-      function goToSlide(index) {
-        if (index < 0) index = slideCount - 1;
-        if (index >= slideCount) index = 0;
+      // Set initial position
+      track.style.transition = 'none';
+      track.style.transform = `translateX(-100%)`;
+
+      function goToSlide(index, withTransition = true) {
         currentIndex = index;
 
-        track.style.transition = 'transform 0.5s ease-in-out';
+        if (withTransition) {
+          track.style.transition = 'transform 0.5s ease-in-out';
+        } else {
+          track.style.transition = 'none';
+        }
+
         track.style.transform = `translateX(-${currentIndex * 100}%)`;
 
+        // Calculate real index for dots
+        let realIndex = currentIndex - 1;
+        if (currentIndex === 0) realIndex = totalSlides - 1;
+        if (currentIndex === totalSlides + 1) realIndex = 0;
+
         dots.forEach((dot, i) => {
-          if (i === currentIndex) {
+          if (i === realIndex) {
             dot.className = 'hero-dot w-6 h-2 rounded-full bg-[#D4AF37] transition-all duration-300';
           } else {
             dot.className = 'hero-dot w-2 h-2 rounded-full bg-[#EAE5D9] transition-all duration-300';
           }
         });
       }
+
+      track.addEventListener('transitionend', () => {
+        if (currentIndex === 0) {
+          goToSlide(totalSlides, false);
+        } else if (currentIndex === totalSlides + 1) {
+          goToSlide(1, false);
+        }
+      });
 
       function nextSlide() {
         goToSlide(currentIndex + 1);
@@ -550,7 +601,7 @@ if (!reviews || reviews.length === 0) {
         dot.addEventListener('click', (e) => {
           const target = e.target as HTMLElement;
           const index = parseInt(target.dataset.index || '0', 10);
-          goToSlide(index);
+          goToSlide(index + 1); // +1 because index 0 is actually slide 1 in DOM
           startAutoSlide();
         });
       });
