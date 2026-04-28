@@ -18,6 +18,18 @@ import { ClientRouter } from 'astro:transitions';
 		<ClientRouter />
 	</head>
 	<body class="bg-[#FCFBF8] text-[#333333] font-['Plus_Jakarta_Sans',_sans-serif]">
+		<!-- Global Cart Notification Popup -->
+		<div
+			id="cart-notification"
+			class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-[#2D2A26] text-[#F5F2EA] px-6 py-3 rounded-full shadow-lg font-medium text-sm flex items-center gap-3 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none touch-none select-none"
+			style="touch-action: none;"
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M20 6 9 17l-5-5"></path>
+			</svg>
+			Added to Cart
+		</div>
+
 		<slot />
 
 		<script lang="ts">
@@ -36,7 +48,7 @@ import { ClientRouter } from 'astro:transitions';
 				}
 
 				let totalQuantity = 0;
-				cart.forEach((item: any) => {
+				cart.forEach((item) => {
 					totalQuantity += item.quantity || 1;
 				});
 
@@ -50,11 +62,139 @@ import { ClientRouter } from 'astro:transitions';
 				});
 			}
 
+			let notificationTimeout = null;
+			let startY = 0;
+			let currentY = 0;
+			let isDragging = false;
+
+			function showCartNotification() {
+				const notification = document.getElementById('cart-notification');
+				if (!notification) return;
+
+				// Reset any inline transform styles from dragging
+				notification.style.transform = '';
+
+				// Show notification
+				notification.classList.remove('-translate-y-24', 'opacity-0', 'pointer-events-none');
+				notification.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+
+				// Clear existing timeout
+				isDragging = false;
+				if (notificationTimeout !== null) {
+					window.clearTimeout(notificationTimeout);
+				}
+
+				// Hide after 5 seconds
+				notificationTimeout = window.setTimeout(() => {
+					hideCartNotification();
+				}, 5000);
+			}
+
+			function hideCartNotification() {
+				const notification = document.getElementById('cart-notification');
+				if (!notification) return;
+
+				notification.style.transform = '';
+				notification.classList.add('-translate-y-24', 'opacity-0', 'pointer-events-none');
+				notification.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+			}
+
+			function handleTouchStart(e) {
+				const notification = document.getElementById('cart-notification');
+				if (!notification || notification.classList.contains('opacity-0')) return;
+
+				isDragging = true;
+				startY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+				currentY = startY;
+
+				// Remove transition during drag for immediate feedback
+				notification.classList.remove('transition-all', 'duration-300');
+
+				isDragging = false;
+				if (notificationTimeout !== null) {
+					window.clearTimeout(notificationTimeout);
+				}
+			}
+
+			function handleTouchMove(e) {
+				if (!isDragging) return;
+
+				const notification = document.getElementById('cart-notification');
+				if (!notification) return;
+
+				currentY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+				const deltaY = currentY - startY;
+
+				// Only allow dragging upwards or slightly downwards
+				if (deltaY < 0) {
+					e.preventDefault(); // Prevent scrolling
+					notification.style.transform = `translate(-50%, ${deltaY}px)`;
+				}
+			}
+
+			function handleTouchEnd() {
+				if (!isDragging) return;
+				isDragging = false;
+
+				const notification = document.getElementById('cart-notification');
+				if (!notification) return;
+
+				notification.classList.add('transition-all', 'duration-300');
+
+				const deltaY = currentY - startY;
+
+				// If dragged up enough, hide it
+				if (deltaY < -20) {
+					hideCartNotification();
+				} else {
+					// Otherwise bounce back and resume timeout
+					notification.style.transform = '';
+					notificationTimeout = window.setTimeout(() => {
+						hideCartNotification();
+					}, 5000);
+				}
+			}
+
+			function initCartNotification() {
+
+				updateCartBadge();
+
+				const notification = document.getElementById('cart-notification');
+				if (notification) {
+					// Clean up previous event listeners if needed
+					notification.replaceWith(notification.cloneNode(true));
+					const newNotification = document.getElementById('cart-notification');
+
+					if (newNotification) {
+						newNotification.addEventListener('touchstart', handleTouchStart , { passive: false });
+						newNotification.addEventListener('touchmove', handleTouchMove , { passive: false });
+						newNotification.addEventListener('touchend', handleTouchEnd);
+
+						newNotification.addEventListener('mousedown', handleTouchStart );
+						document.addEventListener('mousemove', handleTouchMove );
+						document.addEventListener('mouseup', handleTouchEnd);
+					}
+				}
+			}
+
 			// Update on page load
-			document.addEventListener("astro:page-load", updateCartBadge);
+			document.addEventListener("astro:page-load", initCartNotification);
 
 			// Listen for custom event
-			document.addEventListener('cart-updated', updateCartBadge);
+			document.addEventListener('cart-updated', () => {
+				updateCartBadge();
+				showCartNotification();
+			});
+
+			// Cleanup event listeners before swap
+			document.addEventListener("astro:before-swap", () => {
+				document.removeEventListener('mousemove', handleTouchMove );
+				document.removeEventListener('mouseup', handleTouchEnd);
+				isDragging = false;
+				if (notificationTimeout !== null) {
+					window.clearTimeout(notificationTimeout);
+				}
+			});
 		</script>
 	</body>
 </html>
