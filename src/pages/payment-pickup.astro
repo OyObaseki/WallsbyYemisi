@@ -95,12 +95,15 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
 
 <script is:inline src="https://js.paystack.co/v1/inline.js"></script>
 
-<script lang="ts">
-  document.addEventListener("astro:page-load", () => {
+<script>
+  function renderPaymentPickupCart() {
     let orderType = 'PickUp';
     // 2. Cart Summary Logic
     const orderItemsContainer = document.getElementById('order-items');
     const orderTotalEl = document.getElementById('order-total');
+
+    if (!orderItemsContainer || !orderTotalEl) return;
+
     let cart: any[] = [];
     let cartTotal = 0;
 
@@ -113,13 +116,12 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
       console.error('Error parsing cart', e);
     }
 
-    if (orderItemsContainer && orderTotalEl) {
-      // Clear container before rendering (useful for view transitions)
-      orderItemsContainer.innerHTML = '';
+    // Clear container before rendering (useful for view transitions)
+    orderItemsContainer.innerHTML = '';
 
-      if (cart.length === 0) {
-        orderItemsContainer.innerHTML = '<p class="text-[#A39E93]">Your cart is empty.</p>';
-      } else {
+    if (cart.length === 0) {
+      orderItemsContainer.innerHTML = '<p class="text-[#A39E93]">Your cart is empty.</p>';
+    } else {
         cart.forEach((item) => {
           const itemTotal = item.price * item.quantity;
           cartTotal += itemTotal;
@@ -130,17 +132,17 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
           const imgEl = document.createElement('img');
           imgEl.src = item.image || '';
           imgEl.alt = item.title;
-          imgEl.className = "w-16 h-16 object-cover rounded-lg bg-[#F5F2EA]";
+          imgEl.className = "w-16 h-16 object-cover rounded-lg bg-[#F5F2EA] flex-shrink-0";
 
           const detailsDiv = document.createElement('div');
-          detailsDiv.className = "flex-1 flex justify-between items-center";
+          detailsDiv.className = "flex-1 flex justify-between items-center gap-2";
 
           const infoSpan = document.createElement('span');
-          infoSpan.className = "text-[#2D2A26] font-medium text-sm md:text-base";
+          infoSpan.className = "text-[#2D2A26] font-medium text-sm md:text-base break-words";
           infoSpan.textContent = `${item.title} – Qty: ${item.quantity}`;
 
           const priceSpan = document.createElement('span');
-          priceSpan.className = "font-medium text-[#2D2A26]";
+          priceSpan.className = "font-medium text-[#2D2A26] flex-shrink-0";
           priceSpan.textContent = `₦${itemTotal.toLocaleString()}`;
 
           detailsDiv.appendChild(infoSpan);
@@ -152,7 +154,6 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
           orderItemsContainer.appendChild(el);
         });
         orderTotalEl.textContent = '₦' + cartTotal.toLocaleString();
-      }
     }
 
     // 3. Form Submission & Paystack
@@ -232,5 +233,14 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
         handler.openIframe();
       });
     }
+  }
+
+  // Ensure the script executes on every client-side route
+  document.addEventListener("astro:page-load", () => {
+    // Small timeout to guarantee DOM elements exist in View Transitions
+    setTimeout(renderPaymentPickupCart, 50);
   });
+
+  // Call it immediately for SSR initial load.
+  setTimeout(renderPaymentPickupCart, 50);
 </script>
