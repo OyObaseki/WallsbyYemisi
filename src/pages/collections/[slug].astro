@@ -37,7 +37,7 @@ const { name } = Astro.props;
 
 let products: any[] = [];
 try {
-  products = await sanityClient.fetch(`*[_type == "product" && collection == $slug]{
+  products = await sanityClient.fetch(`*[_type == "product" && collection->slug.current == $slug]{
     _id,
     title,
     "description": pt::text(description),
