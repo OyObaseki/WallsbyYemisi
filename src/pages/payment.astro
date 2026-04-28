@@ -20,7 +20,7 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
     <!-- Toggle Delivery / Pick Up -->
     <div class="flex justify-center mb-10">
       <div class="bg-[#F5F2EA] p-1 rounded-full flex relative w-full max-w-[300px]">
-        <div class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#C59F58] rounded-full"></div>
+        <div class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#C59F58] rounded-full" transition:name="payment-toggle-highlight"></div>
         <span class="flex-1 text-white relative z-10 py-3 rounded-full font-medium text-center">Delivery</span>
         <a href="/payment-pickup" class="flex-1 text-[#A39E93] hover:text-[#2D2A26] relative z-10 py-3 rounded-full font-medium text-center transition-colors duration-300 block">Pick Up</a>
       </div>
@@ -141,7 +141,7 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
             <!-- Order items will be populated by JS -->
           </div>
           <div class="border-t border-[#EBE6DC] pt-6 flex justify-between items-end">
-             <span class="text-lg font-medium text-[#2D2A26]">Total:</span>
+             <span class="text-lg font-medium text-[#2D2A26]">Estimated Total:</span>
              <span class="text-[#2D2A26] font-bold text-2xl" id="order-total">₦0</span>
           </div>
         </div>
@@ -190,27 +190,30 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
           cartTotal += itemTotal;
 
           const el = document.createElement('div');
-          el.className = "flex justify-between items-start gap-4";
+          el.className = "flex items-center gap-4 py-2";
+
+          const imgEl = document.createElement('img');
+          imgEl.src = item.image || '';
+          imgEl.alt = item.title;
+          imgEl.className = "w-16 h-16 object-cover rounded-lg bg-[#F5F2EA]";
 
           const detailsDiv = document.createElement('div');
+          detailsDiv.className = "flex-1 flex justify-between items-center";
 
-          const titleP = document.createElement('p');
-          titleP.className = "font-medium text-[#2D2A26]";
-          titleP.textContent = item.title;
+          const infoSpan = document.createElement('span');
+          infoSpan.className = "text-[#2D2A26] font-medium text-sm md:text-base";
+          infoSpan.textContent = `${item.title} – Qty: ${item.quantity}`;
 
-          const descP = document.createElement('p');
-          descP.className = "text-sm text-[#A39E93]";
-          descP.textContent = `Qty: ${item.quantity} | Size: ${item.size} | Frame: ${item.frame}`;
+          const priceSpan = document.createElement('span');
+          priceSpan.className = "font-medium text-[#2D2A26]";
+          priceSpan.textContent = `₦${itemTotal.toLocaleString()}`;
 
-          detailsDiv.appendChild(titleP);
-          detailsDiv.appendChild(descP);
+          detailsDiv.appendChild(infoSpan);
+          detailsDiv.appendChild(priceSpan);
 
-          const priceP = document.createElement('p');
-          priceP.className = "font-medium text-[#2D2A26]";
-          priceP.textContent = `₦${itemTotal.toLocaleString()}`;
-
+          el.appendChild(imgEl);
           el.appendChild(detailsDiv);
-          el.appendChild(priceP);
+
           orderItemsContainer.appendChild(el);
         });
         orderTotalEl.textContent = '₦' + cartTotal.toLocaleString();
