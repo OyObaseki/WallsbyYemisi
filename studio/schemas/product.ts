@@ -27,15 +27,8 @@ export const product = defineType({
     defineField({
       name: 'collection',
       title: 'Collection',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Monochrome', value: 'monochrome' },
-          { title: 'Azure Deep', value: 'azure-deep' },
-          { title: 'Velvet Night', value: 'velvet-night' },
-          { title: 'Terra Cotta', value: 'terra-cotta' }
-        ]
-      }
+      type: 'reference',
+      to: [{ type: 'collection' }]
     }),
     defineField({
       name: 'variants',
