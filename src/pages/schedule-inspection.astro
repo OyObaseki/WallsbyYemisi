@@ -9,6 +9,8 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
   <!-- Header -->
   <Header />
 
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+
   <main class="container mx-auto px-4 py-16 min-h-[60vh] max-w-3xl">
     <div id="paystack-pk" data-key={paystackPublicKey} hidden></div>
     <div class="text-center mb-12">
@@ -38,7 +40,9 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
 
           <div class="space-y-2">
             <label for="date" class="block text-sm font-medium text-gray-700">Preferred Date</label>
-            <input type="date" id="date" name="date" required class="w-full px-4 py-3 border border-gray-200 rounded-md focus:ring-2 focus:ring-[#8C7A6B] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white text-gray-700">
+            <input type="text" id="date" name="date" required readonly class="w-full px-4 py-3 border border-gray-200 rounded-md focus:ring-2 focus:ring-[#8C7A6B] focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white text-gray-700 cursor-pointer" placeholder="Click to select date on Calendly">
+            <p id="calendly-fallback" class="hidden text-sm text-red-500 mt-1">Unable to load calendar. Please refresh or try again later.</p>
+            <p id="calendly-success" class="hidden text-sm text-green-600 mt-1 font-medium">Your preferred inspection date has been selected.</p>
           </div>
         </div>
 
@@ -104,18 +108,67 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
       </form>
     </div>
   </main>
-</Layout>
 
-<script is:inline src="https://js.paystack.co/v1/inline.js"></script>
+  <script is:inline src="https://js.paystack.co/v1/inline.js"></script>
+  <script is:inline src="https://assets.calendly.com/assets/external/widget.js"></script>
+</Layout>
 
 <script>
   document.addEventListener('astro:page-load', () => {
     const form = document.getElementById('inspection-form');
     const submitBtn = document.getElementById('submit-btn');
     const paymentError = document.getElementById('payment-error');
+    const dateInput = document.getElementById('date');
+    const calendlyFallback = document.getElementById('calendly-fallback');
+    const calendlySuccess = document.getElementById('calendly-success');
 
     // Using vanilla JS logic without TS annotations
-    if (form && submitBtn && paymentError) {
+    if (form && submitBtn && paymentError && dateInput) {
+      // Calendly Integration
+      const openCalendly = () => {
+        calendlyFallback.classList.add('hidden');
+        calendlySuccess.classList.add('hidden');
+
+        // Check if Calendly is loaded
+        if (!window.Calendly) {
+          calendlyFallback.classList.remove('hidden');
+          return;
+        }
+
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+
+        const prefill = {};
+        if (nameInput && nameInput.value) prefill.name = nameInput.value;
+        if (emailInput && emailInput.value) prefill.email = emailInput.value;
+
+        window.Calendly.initPopupWidget({
+          url: 'https://calendly.com/wallsbyyemisi', // Use placeholder/default Calendly link
+          prefill: prefill
+        });
+      };
+
+      dateInput.addEventListener('click', openCalendly);
+
+      // Listen for Calendly events
+      const handleCalendlyEvent = (e) => {
+        if (e.data && e.data.event === 'calendly.event_scheduled') {
+          dateInput.value = "Date Selected via Calendly";
+          calendlySuccess.classList.remove('hidden');
+
+          // Trigger form validation update
+          const event = new Event('input', { bubbles: true });
+          form.dispatchEvent(event);
+        }
+      };
+
+      window.addEventListener('message', handleCalendlyEvent);
+
+      // Cleanup listener on page transition to prevent duplicate listeners
+      document.addEventListener('astro:before-swap', () => {
+        window.removeEventListener('message', handleCalendlyEvent);
+      }, { once: true });
+
       // Validate form on input to enable/disable button
       form.addEventListener('input', () => {
         if (form.checkValidity()) {
