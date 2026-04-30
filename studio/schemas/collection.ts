@@ -27,5 +27,11 @@ export const collection = defineType({
         hotspot: true,
       },
     }),
+    defineField({
+      name: 'frames',
+      title: 'Frames',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'product' }] }],
+    }),
   ],
 })
