@@ -68,8 +68,8 @@ try {
       _type,
       title,
       "description": pt::text(description),
-      "imageUrl": featuredImage.asset->url,
-      "catalogueImageUrl": coverImage.asset->url,
+      "imageUrl": coalesce(images[0].asset->url, featuredImage.asset->url),
+      "catalogueImageUrl": coalesce(images[0].asset->url, coverImage.asset->url),
       "slug": slug.current,
       pdfUrl,
       "price": variants[0].price
