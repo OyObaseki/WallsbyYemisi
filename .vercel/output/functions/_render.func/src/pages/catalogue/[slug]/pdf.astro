@@ -1,0 +1,113 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { sanityClient } from '../../../lib/sanity';
+
+export async function getStaticPaths() {
+  let paths = [];
+  try {
+    const catalogues = await sanityClient.fetch(`*[_type == "catalogue"]{
+      "slug": slug.current
+    }`);
+
+    if (catalogues && catalogues.length > 0) {
+      paths = catalogues.map((cat: any) => ({
+        params: { slug: cat.slug }
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching catalogue paths:", error);
+  }
+
+  // Always provide fallback paths for mock data
+  paths.push(
+    { params: { slug: 'spring-collection-2024' } },
+    { params: { slug: 'monochrome-series' } }
+  );
+
+  // Remove duplicates
+  const uniquePaths = Array.from(new Set(paths.map(p => p.params.slug)))
+    .map(slug => ({ params: { slug } }));
+
+  return uniquePaths;
+}
+
+const { slug } = Astro.params;
+
+let catalogueData: any = null;
+
+try {
+  catalogueData = await sanityClient.fetch(`*[_type == "catalogue" && slug.current == $slug][0]{
+    "pdfUrl": pdfUrl.asset->url
+  }`, { slug });
+} catch (error) {
+  console.error("Error fetching catalogue data:", error);
+}
+
+// Fallback mock data if CMS is empty or errors
+if (!catalogueData) {
+  const allMockCatalogues: any = {
+    'spring-collection-2024': {
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+    },
+    'monochrome-series': {
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+    }
+  };
+
+  catalogueData = allMockCatalogues[slug as string] || allMockCatalogues['spring-collection-2024'];
+}
+---
+
+<Layout>
+  <main class="h-screen w-full flex flex-col bg-[#F5F2EA]">
+    <!-- Header with Back Button -->
+    <header class="flex items-center px-4 py-4 md:px-8 shadow-sm bg-white shrink-0">
+      <a
+        href={`/catalogue/${slug}#quote`}
+        class="inline-flex items-center gap-2 text-[#2D2A26] hover:text-[#C59F58] font-medium transition-colors duration-300"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back
+      </a>
+      <div class="flex-1 text-center">
+        <h1 class="text-xl font-bold text-[#2D2A26] uppercase tracking-wider hidden md:block">Catalogue PDF Viewer</h1>
+      </div>
+      <div class="w-16 md:w-24"></div> <!-- Spacer for centering title -->
+    </header>
+
+    <!-- PDF Viewer -->
+    <div class="flex-1 w-full h-full relative overflow-hidden">
+      {catalogueData?.pdfUrl ? (
+        <object
+          data={catalogueData.pdfUrl}
+          type="application/pdf"
+          class="w-full h-full absolute inset-0 border-none"
+          title={`Catalogue PDF for ${slug}`}
+        >
+          <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-white">
+            <p class="mb-4 text-[#2D2A26]">Your browser doesn't support embedded PDFs.</p>
+            <a
+              href={catalogueData.pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center bg-[#2D2A26] text-white font-medium py-3 px-6 rounded-full hover:bg-[#C59F58] transition-colors duration-300"
+            >
+              Download PDF instead
+            </a>
+          </div>
+        </object>
+      ) : (
+        <div class="flex flex-col items-center justify-center h-full p-8 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-[#A39E93] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <h2 class="text-2xl font-bold text-[#2D2A26] mb-2">PDF Not Found</h2>
+          <p class="text-[#A39E93] max-w-md">Sorry, we couldn't load the PDF for this catalogue. It may not exist or has been moved.</p>
+        </div>
+      )}
+    </div>
+  </main>
+</Layout>

@@ -1,0 +1,105 @@
+import { c as createComponent } from './astro-component_DaxBLt9h.mjs';
+import 'piccolore';
+import { l as renderComponent, r as renderTemplate, m as maybeRenderHead, h as addAttribute } from './entrypoint_BiL0RRI3.mjs';
+import { $ as $$Layout } from './Layout_D7SbrltP.mjs';
+import { $ as $$Header } from './Header_C93-YQqD.mjs';
+import { $ as $$Footer } from './Footer_cNfD0S-t.mjs';
+import { s as sanityClient } from './sanity_D30T0eWg.mjs';
+
+const $$FrameCatalog = createComponent(async ($$result, $$props, $$slots) => {
+  let products = [];
+  try {
+    products = await sanityClient.fetch(`*[_type == "product"]{
+    _id,
+    title,
+    "description": pt::text(description),
+    "imageUrl": featuredImage.asset->url,
+    variants
+  }`);
+  } catch (error) {
+    console.error("Error fetching products from Sanity:", error);
+  }
+  if (!products || products.length === 0) {
+    products = [
+      {
+        _id: "mock-1",
+        title: "Queen of Orisun",
+        description: "Original Canvas",
+        imageUrl: "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        variants: [
+          { title: "24x36 frameless", price: 75e3 },
+          { title: "30x40 frameless", price: 95e3 }
+        ]
+      },
+      {
+        _id: "mock-2",
+        title: "Night Bloom",
+        description: "Art Print",
+        imageUrl: "https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        variants: [
+          { title: "24x36 frameless", price: 65e3 }
+        ]
+      },
+      {
+        _id: "mock-3",
+        title: "Golden Hour",
+        description: "Mixed Media",
+        imageUrl: "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        variants: []
+      },
+      {
+        _id: "mock-4",
+        title: "Azure Deep",
+        description: "Original Canvas",
+        imageUrl: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        variants: [
+          { title: "24x36 framed", price: 85e3 }
+        ]
+      }
+    ];
+  }
+  const formatNaira = (amount) => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+  const processedProducts = products.map((product) => {
+    let minPrice = 0;
+    let sizes = [];
+    if (product.variants && Array.isArray(product.variants) && product.variants.length > 0) {
+      minPrice = Math.min(...product.variants.map((v) => v.price || 0));
+      const extractedSizes = product.variants.map((v) => {
+        const parts = v.title ? v.title.split(" ") : [];
+        return parts[0] || "";
+      }).filter(Boolean);
+      sizes = [...new Set(extractedSizes)];
+    } else {
+      minPrice = 75e3;
+    }
+    return {
+      ...product,
+      minPrice,
+      sizesPreview: sizes.length > 0 ? sizes.join(", ") : "Various sizes"
+    };
+  });
+  return renderTemplate`${renderComponent($$result, "Layout", $$Layout, {}, { "default": async ($$result2) => renderTemplate`  ${renderComponent($$result2, "Header", $$Header, {})} ${maybeRenderHead()}<main class="container mx-auto px-4 py-16 min-h-[60vh] max-w-lg md:max-w-6xl"> <div class="text-center mb-16"> <h1 class="text-4xl md:text-5xl font-bold text-[#2D2A26] mb-4 uppercase tracking-wider">Frame Catalog</h1> <p class="text-[#A39E93] text-lg max-w-2xl mx-auto">Explore our collection of beautifully curated frames and artworks. Find the perfect fit for your space.</p> </div> ${processedProducts.length === 0 ? renderTemplate`<p class="text-center text-gray-500 text-xl py-12">No frames currently available.</p>` : renderTemplate`<div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6"> ${processedProducts.map((product) => renderTemplate`<a${addAttribute(`/product/${product._id}`, "href")} class="block transition hover:-translate-y-1 h-full"> <div class="bg-[#FDFBF7] rounded-[24px] p-2 flex flex-col shadow-sm border border-[#F3EFE6] h-full group hover:shadow-md transition-shadow duration-300"> <div class="relative w-full aspect-square rounded-[20px] overflow-hidden mb-3 bg-[#F5F2EA]"> <img${addAttribute(product.imageUrl, "src")}${addAttribute(product.title, "alt")} class="w-full h-full object-cover mix-blend-multiply transition-transform duration-500 group-hover:scale-105"> </div> <div class="px-2 pb-2 flex flex-col flex-grow"> <h3 class="font-bold text-[#2D2A26] text-sm md:text-base leading-tight mb-1">${product.title}</h3> <div class="text-[#A39E93] text-xs mb-3 flex-grow flex flex-col gap-1"> <span class="truncate">Sizes: ${product.sizesPreview}</span> </div> <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mt-auto"> <span class="text-[#C59F58] font-bold text-sm md:text-base">From ${formatNaira(product.minPrice)}</span> <div class="w-full md:hidden text-center bg-transparent border border-[#2D2A26] text-[#2D2A26] group-hover:bg-[#2D2A26] group-hover:text-white font-medium py-2 px-4 rounded transition-colors duration-300 uppercase tracking-wider text-xs">
+View Product
+</div> <div class="hidden md:flex w-8 h-8 shrink-0 rounded-full bg-[#F5F2EA] items-center justify-center text-[#C59F58] group-hover:bg-[#EAE5D9] transition"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <line x1="12" x2="12" y1="5" y2="19"></line> <line x1="5" x2="19" y1="12" y2="12"></line> </svg> </div> </div> </div> </div> </a>`)} </div>`} </main>  ${renderComponent($$result2, "Footer", $$Footer, {})} ` })}`;
+}, "/app/src/pages/frame-catalog.astro", void 0);
+
+const $$file = "/app/src/pages/frame-catalog.astro";
+const $$url = "/frame-catalog";
+
+const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: $$FrameCatalog,
+  file: $$file,
+  url: $$url
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const page = () => _page;
+
+export { page };
