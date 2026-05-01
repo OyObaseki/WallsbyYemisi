@@ -1,0 +1,177 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+---
+
+<Layout>
+  <!-- Header -->
+  <Header />
+
+  <main class="container mx-auto px-4 py-8 max-w-lg md:max-w-4xl min-h-[60vh]">
+    <h1 class="text-3xl font-bold text-[#2D2A26] mb-8 uppercase">Your Cart</h1>
+
+    <div id="cart-container" class="hidden">
+      <div id="cart-items" class="flex flex-col gap-6 mb-8">
+        <!-- Cart items will be rendered here by JS -->
+      </div>
+
+      <div class="border-t border-[#EBE6DC] pt-6 mb-8">
+        <div class="flex justify-between items-end">
+          <span class="text-lg font-medium text-[#2D2A26]">Total</span>
+          <span class="text-[#C59F58] font-bold text-3xl" id="cart-total">₦0</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-between gap-4">
+        <a href="/" class="border-2 border-[#C59F58] text-[#C59F58] hover:bg-[#F5F2EA] px-8 py-3 rounded-full font-medium transition duration-300 text-center">
+          Continue Shopping
+        </a>
+        <button id="checkout-btn" class="bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300 text-center">
+          Checkout
+        </button>
+      </div>
+    </div>
+
+    <div id="empty-cart-message" class="hidden flex-col items-center justify-center py-16">
+      <div class="w-24 h-24 rounded-full bg-[#F5F2EA] flex items-center justify-center text-[#A39E93] mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+          <path d="M3 6h18"></path>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-[#2D2A26] mb-2">Your cart is empty</h2>
+      <p class="text-[#A39E93] mb-8 text-center max-w-sm">Looks like you haven't added any beautiful artworks to your cart yet.</p>
+      <a href="/" class="bg-[#C59F58] hover:bg-[#B08D4C] text-white px-8 py-3 rounded-full font-medium transition duration-300">
+        Start Shopping
+      </a>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const cartContainer = document.getElementById('cart-container');
+    const emptyCartMessage = document.getElementById('empty-cart-message');
+    const cartItemsContainer = document.getElementById('cart-items');
+    const cartTotalElement = document.getElementById('cart-total');
+
+    if (!cartContainer || !emptyCartMessage || !cartItemsContainer || !cartTotalElement) {
+      return;
+    }
+
+    let cart = [];
+    try {
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+      }
+    } catch (error) {
+      console.error('Error parsing cart from localStorage', error);
+    }
+
+    function saveCart() {
+      localStorage.setItem('cart', JSON.stringify(cart));
+      document.dispatchEvent(new CustomEvent('cart-updated'));
+    }
+
+    function renderCart() {
+      cartItemsContainer.innerHTML = '';
+
+      if (cart.length === 0) {
+        cartContainer.classList.add('hidden');
+        emptyCartMessage.classList.remove('hidden');
+        emptyCartMessage.classList.add('flex');
+        return;
+      }
+
+      cartContainer.classList.remove('hidden');
+      emptyCartMessage.classList.add('hidden');
+      emptyCartMessage.classList.remove('flex');
+
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
+        const itemEl = document.createElement('div');
+        itemEl.className = "flex flex-col sm:flex-row gap-6 p-4 bg-[#FDFBF7] rounded-[24px] border border-[#F3EFE6] shadow-sm";
+
+        itemEl.innerHTML = `
+          <div class="w-full sm:w-1/4 aspect-square rounded-[16px] overflow-hidden bg-[#F5F2EA] flex-shrink-0">
+            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover mix-blend-multiply" />
+          </div>
+          <div class="flex flex-col flex-grow justify-between py-2">
+            <div class="flex justify-between items-start gap-4 mb-4 sm:mb-0">
+              <div>
+                <h3 class="text-xl font-bold text-[#2D2A26] mb-1">${item.title}</h3>
+                <p class="text-[#A39E93] text-sm">Size: <span class="text-[#2D2A26]">${item.size}</span> | Frame: <span class="text-[#2D2A26] capitalize">${item.frame}</span></p>
+              </div>
+              <button class="text-[#A39E93] hover:text-red-500 transition remove-btn" data-index="${index}" aria-label="Remove item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="flex justify-between items-end mt-4">
+              <div class="flex items-center border border-[#EBE6DC] rounded-full overflow-hidden bg-white">
+                <button class="w-8 h-8 flex items-center justify-center text-[#2D2A26] hover:bg-[#F5F2EA] transition decrease-btn" data-index="${index}">-</button>
+                <span class="w-8 text-center font-medium text-[#2D2A26]">${item.quantity}</span>
+                <button class="w-8 h-8 flex items-center justify-center text-[#2D2A26] hover:bg-[#F5F2EA] transition increase-btn" data-index="${index}">+</button>
+              </div>
+              <span class="text-[#C59F58] font-bold text-xl">₦${itemTotal.toLocaleString()}</span>
+            </div>
+          </div>
+        `;
+
+        cartItemsContainer.appendChild(itemEl);
+      });
+
+      cartTotalElement.textContent = '₦' + total.toLocaleString();
+
+      // Add event listeners for new buttons
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt((e.currentTarget as HTMLElement).getAttribute('data-index') || '0', 10);
+          cart.splice(index, 1);
+          saveCart();
+          renderCart();
+        });
+      });
+
+      document.querySelectorAll('.decrease-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt((e.currentTarget as HTMLElement).getAttribute('data-index') || '0', 10);
+          if (cart[index].quantity > 1) {
+            cart[index].quantity -= 1;
+            saveCart();
+            renderCart();
+          }
+        });
+      });
+
+      document.querySelectorAll('.increase-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt((e.currentTarget as HTMLElement).getAttribute('data-index') || '0', 10);
+          cart[index].quantity += 1;
+          saveCart();
+          renderCart();
+        });
+      });
+    }
+
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener('click', () => {
+        window.location.href = '/payment';
+      });
+    }
+
+    // Initial render
+    renderCart();
+  });
+</script>
