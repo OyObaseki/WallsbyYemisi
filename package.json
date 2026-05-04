@@ -12,7 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/vercel": "^10.0.6",
+    "@astrojs/netlify": "^7.0.8",
     "@paystack/inline-js": "^2.22.8",
     "@sanity/client": "^7.20.0",
     "@tailwindcss/vite": "^4.2.1",
