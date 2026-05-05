@@ -99,7 +99,7 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
           Schedule Now
         </button>
 
-        <div id="payment-error" class="hidden mt-4 text-red-500 text-center font-medium"></div>
+        <div id="payment-message" class="hidden mt-4 text-center font-medium"></div>
       </form>
     </div>
   </main>
@@ -111,10 +111,10 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
   document.addEventListener('astro:page-load', () => {
     const form = document.getElementById('inspection-form');
     const submitBtn = document.getElementById('submit-btn');
-    const paymentError = document.getElementById('payment-error');
+    const paymentMessage = document.getElementById('payment-message');
 
     // Using vanilla JS logic without TS annotations
-    if (form && submitBtn && paymentError) {
+    if (form && submitBtn && paymentMessage) {
       // Validate form on input to enable/disable button
       form.addEventListener('input', () => {
         if (form.checkValidity()) {
@@ -133,7 +133,8 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
         e.preventDefault();
 
         // Hide previous errors
-        paymentError.classList.add('hidden');
+        paymentMessage.classList.add('hidden');
+        paymentMessage.className = 'hidden mt-4 text-center font-medium';
 
         // Disable button and show processing
         const originalText = submitBtn.textContent;
@@ -193,17 +194,31 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)
-            }).then(() => {
-              window.location.href = '/booking-confirmation';
             }).catch((err) => {
               console.error('Failed to send email notification:', err);
-              window.location.href = '/booking-confirmation';
+            }).finally(() => {
+              // Show success message
+              paymentMessage.textContent = "Payment successful! Please select your preferred inspection date and time.";
+              paymentMessage.className = 'mt-4 text-green-600 text-center font-medium';
+              submitBtn.textContent = 'Redirecting to Calendly...';
+
+              // Construct Calendly URL with prefilled data
+              const calendlyUrl = new URL('https://calendly.com/wallsbyyemisi/30min');
+              calendlyUrl.searchParams.set('back', '1');
+              calendlyUrl.searchParams.set('month', '2026-05');
+              if (name) calendlyUrl.searchParams.set('name', name.toString());
+              if (email) calendlyUrl.searchParams.set('email', email.toString());
+
+              // Redirect after delay
+              setTimeout(() => {
+                window.location.href = calendlyUrl.toString();
+              }, 2500);
             });
           },
           onClose: function() {
             // Re-enable form button and show error
-            paymentError.textContent = "Payment not completed. Please try again.";
-            paymentError.classList.remove('hidden');
+            paymentMessage.textContent = "Payment not completed. Please try again.";
+            paymentMessage.className = 'mt-4 text-red-500 text-center font-medium';
             submitBtn.textContent = 'SCHEDULE NOW';
             submitBtn.disabled = false;
           }
