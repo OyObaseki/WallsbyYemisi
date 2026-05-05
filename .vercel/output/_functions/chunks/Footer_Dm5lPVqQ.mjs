@@ -1,6 +1,6 @@
-import { c as createComponent } from './astro-component_DaxBLt9h.mjs';
+import { c as createComponent } from './astro-component_BdPxmIoZ.mjs';
 import 'piccolore';
-import { m as maybeRenderHead, r as renderTemplate } from './entrypoint_BiL0RRI3.mjs';
+import { m as maybeRenderHead, r as renderTemplate } from './entrypoint_DOysf-Fi.mjs';
 import 'clsx';
 
 const $$Footer = createComponent(($$result, $$props, $$slots) => {

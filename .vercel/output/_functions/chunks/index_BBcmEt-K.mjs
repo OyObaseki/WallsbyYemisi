@@ -1,8 +1,8 @@
-import { c as createComponent } from './astro-component_DaxBLt9h.mjs';
+import { c as createComponent } from './astro-component_BdPxmIoZ.mjs';
 import 'piccolore';
-import { l as renderComponent, r as renderTemplate, m as maybeRenderHead } from './entrypoint_BiL0RRI3.mjs';
-import { $ as $$Layout, r as renderScript } from './Layout_D7SbrltP.mjs';
-import { $ as $$Header } from './Header_C93-YQqD.mjs';
+import { l as renderComponent, r as renderTemplate, m as maybeRenderHead } from './entrypoint_DOysf-Fi.mjs';
+import { $ as $$Layout, r as renderScript } from './Layout_DglQY64m.mjs';
+import { $ as $$Header } from './Header_NYifAqJ9.mjs';
 
 const $$Index = createComponent(($$result, $$props, $$slots) => {
   return renderTemplate`${renderComponent($$result, "Layout", $$Layout, {}, { "default": ($$result2) => renderTemplate`  ${renderComponent($$result2, "Header", $$Header, {})} ${maybeRenderHead()}<main class="container mx-auto px-4 py-8 max-w-lg md:max-w-4xl min-h-[60vh]"> <h1 class="text-3xl font-bold text-[#2D2A26] mb-8 uppercase">Your Cart</h1> <div id="cart-container" class="hidden"> <div id="cart-items" class="flex flex-col gap-6 mb-8"> <!-- Cart items will be rendered here by JS --> </div> <div class="border-t border-[#EBE6DC] pt-6 mb-8"> <div class="flex justify-between items-end"> <span class="text-lg font-medium text-[#2D2A26]">Total</span> <span class="text-[#C59F58] font-bold text-3xl" id="cart-total">₦0</span> </div> </div> <div class="flex flex-col sm:flex-row justify-between gap-4"> <a href="/" class="border-2 border-[#C59F58] text-[#C59F58] hover:bg-[#F5F2EA] px-8 py-3 rounded-full font-medium transition duration-300 text-center">

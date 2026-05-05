@@ -1,8 +1,8 @@
-import { c as createComponent } from './astro-component_DaxBLt9h.mjs';
+import { c as createComponent } from './astro-component_BdPxmIoZ.mjs';
 import 'piccolore';
-import { l as renderComponent, r as renderTemplate, m as maybeRenderHead } from './entrypoint_BiL0RRI3.mjs';
-import { $ as $$Layout } from './Layout_D7SbrltP.mjs';
-import { $ as $$Header } from './Header_C93-YQqD.mjs';
+import { l as renderComponent, r as renderTemplate, m as maybeRenderHead } from './entrypoint_DOysf-Fi.mjs';
+import { $ as $$Layout } from './Layout_DglQY64m.mjs';
+import { $ as $$Header } from './Header_NYifAqJ9.mjs';
 
 const $$BookingConfirmation = createComponent(($$result, $$props, $$slots) => {
   return renderTemplate`${renderComponent($$result, "Layout", $$Layout, {}, { "default": ($$result2) => renderTemplate`  ${renderComponent($$result2, "Header", $$Header, {})} ${maybeRenderHead()}<main class="container mx-auto px-4 py-24 min-h-[70vh] flex items-center justify-center"> <div class="bg-[#FDFBF7] p-10 md:p-14 rounded-2xl shadow-sm border border-[#F3EFE6] text-center max-w-2xl w-full"> <div class="w-20 h-20 bg-[#F5F2EA] rounded-full flex items-center justify-center mx-auto mb-8 border border-[#EBE6DC]"> <svg class="w-10 h-10 text-[#C59F58]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path> </svg> </div> <h1 class="text-3xl md:text-4xl font-bold text-[#2D2A26] mb-6 uppercase tracking-wider">Payment Successful!</h1> <p class="text-[#A39E93] text-lg md:text-xl leading-relaxed mb-10 max-w-lg mx-auto">

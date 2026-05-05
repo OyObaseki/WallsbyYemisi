@@ -1,8 +1,8 @@
-import { c as createComponent } from './astro-component_DaxBLt9h.mjs';
+import { c as createComponent } from './astro-component_BdPxmIoZ.mjs';
 import 'piccolore';
-import { r as renderTemplate, l as renderComponent, m as maybeRenderHead, h as addAttribute } from './entrypoint_BiL0RRI3.mjs';
-import { $ as $$Layout } from './Layout_D7SbrltP.mjs';
-import { $ as $$Header } from './Header_C93-YQqD.mjs';
+import { r as renderTemplate, l as renderComponent, m as maybeRenderHead, h as addAttribute } from './entrypoint_DOysf-Fi.mjs';
+import { $ as $$Layout } from './Layout_DglQY64m.mjs';
+import { $ as $$Header } from './Header_NYifAqJ9.mjs';
 import { s as sanityClient } from './sanity_D30T0eWg.mjs';
 
 var __freeze = Object.freeze;
