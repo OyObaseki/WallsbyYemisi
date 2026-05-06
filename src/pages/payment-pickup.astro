@@ -221,6 +221,7 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
              // Success
              // Send email
              const payload = {
+                formType: 'Order Pickup',
                 reference: response.reference,
                 name: name,
                 phone: phone,

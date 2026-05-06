@@ -30,44 +30,38 @@ export const POST: APIRoute = async ({ request }) => {
       },
     });
 
-    let htmlContent = `
-      <h2>New Order Received</h2>
-      <p><strong>Order Type:</strong> ${data.order_type}</p>
-      <p><strong>Name:</strong> ${data.name}</p>
-      <p><strong>Email:</strong> ${data.email}</p>
-      <p><strong>Phone:</strong> ${data.phone}</p>
-    `;
+    const formType = data.formType || 'New Form Submission';
+    const senderName = data.name || data.fullName || 'User';
 
-    if (data.address) htmlContent += `<p><strong>Address:</strong> ${data.address}</p>`;
-    if (data.city) htmlContent += `<p><strong>City:</strong> ${data.city}</p>`;
-    if (data.state) htmlContent += `<p><strong>State:</strong> ${data.state}</p>`;
-    if (data.landmark) htmlContent += `<p><strong>Landmark:</strong> ${data.landmark}</p>`;
-    if (data.reference) htmlContent += `<p><strong>Payment Reference:</strong> ${data.reference}</p>`;
-    if (data.amount) htmlContent += `<p><strong>Total Amount:</strong> ₦${data.amount}</p>`;
+    let htmlContent = `<h2>${formType}</h2>`;
 
-    if (data.cart_items) {
-      try {
-        const items = typeof data.cart_items === 'string' ? JSON.parse(data.cart_items) : data.cart_items;
-        if (Array.isArray(items) && items.length > 0) {
-          htmlContent += `<h3>Cart Items:</h3><ul>`;
-          items.forEach((item: any) => {
-            htmlContent += `<li>${item.title} - Qty: ${item.quantity} - Price: ₦${item.price}</li>`;
-          });
-          htmlContent += `</ul>`;
+    for (const [key, value] of Object.entries(data)) {
+      if (key === 'formType') continue;
+
+      if (key === 'cart_items') {
+        try {
+          const items = typeof value === 'string' ? JSON.parse(value as string) : value;
+          if (Array.isArray(items) && items.length > 0) {
+            htmlContent += `<h3>Cart Items:</h3><ul>`;
+            items.forEach((item: any) => {
+              htmlContent += `<li>${item.title} - Qty: ${item.quantity} - Price: ₦${item.price}</li>`;
+            });
+            htmlContent += `</ul>`;
+          }
+        } catch (e) {
+          // failed to parse cart items, ignore
         }
-      } catch (e) {
-        // failed to parse cart items, ignore
+      } else {
+        // Capitalize key
+        const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        htmlContent += `<p><strong>${formattedKey}:</strong> ${value}</p>`;
       }
-    }
-
-    if (data.message) {
-      htmlContent += `<p><strong>Message:</strong> ${data.message}</p>`;
     }
 
     const mailOptions = {
       from: smtpFrom,
       to: smtpTo,
-      subject: `New Order/Booking from ${data.name}`,
+      subject: `${formType} from ${senderName}`,
       html: htmlContent,
     };
 
