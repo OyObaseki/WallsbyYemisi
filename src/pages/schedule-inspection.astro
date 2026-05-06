@@ -178,6 +178,7 @@ const paystackPublicKey = import.meta.env.PAYSTACK_PUBLIC_KEY;
           callback: function(response) {
             // Send email
             const payload = {
+              formType: "Schedule Inspection",
               reference: response.reference,
               name: name,
               phone: phone,

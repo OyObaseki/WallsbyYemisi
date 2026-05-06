@@ -142,6 +142,11 @@ if (!catalogueData) {
           <p>We will contact you shortly with your quote.</p>
         </div>
 
+        <div id="quoteErrorMessage" class="hidden bg-red-50 text-red-800 p-6 rounded-2xl text-center border border-red-200 mb-6">
+          <h4 class="text-xl font-bold mb-2">Error</h4>
+          <p>Failed to submit quote request. Please try again later.</p>
+        </div>
+
         <form id="quoteForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="col-span-1 md:col-span-2">
             <label for="fullName" class="block text-sm font-medium text-[#2D2A26] mb-2">Full Name</label>
@@ -196,7 +201,7 @@ if (!catalogueData) {
           </div>
 
           <div class="col-span-1 md:col-span-2 mt-4">
-            <button type="submit" class="w-full bg-[#2D2A26] text-white font-medium py-4 px-8 rounded-full hover:bg-[#C59F58] transition-colors duration-300 uppercase tracking-wider text-sm">
+            <button id="quoteSubmitBtn" type="submit" class="w-full bg-[#2D2A26] text-white font-medium py-4 px-8 rounded-full hover:bg-[#C59F58] transition-colors duration-300 uppercase tracking-wider text-sm">
               Request Quote
             </button>
           </div>
@@ -284,12 +289,54 @@ if (!catalogueData) {
   function setupQuoteForm() {
     const quoteForm = document.getElementById('quoteForm') as HTMLFormElement;
     const quoteSuccessMessage = document.getElementById('quoteSuccessMessage');
+    const quoteErrorMessage = document.getElementById('quoteErrorMessage');
+    const quoteSubmitBtn = document.getElementById('quoteSubmitBtn') as HTMLButtonElement;
 
-    if (quoteForm && quoteSuccessMessage) {
-      quoteForm.addEventListener('submit', (e) => {
+    if (quoteForm && quoteSuccessMessage && quoteErrorMessage) {
+      quoteForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        quoteForm.classList.add('hidden');
-        quoteSuccessMessage.classList.remove('hidden');
+        quoteErrorMessage.classList.add('hidden');
+
+        if (quoteSubmitBtn) {
+            quoteSubmitBtn.disabled = true;
+            quoteSubmitBtn.textContent = 'Submitting...';
+        }
+
+        const formData = new FormData(quoteForm);
+        const payload = {
+          formType: 'Catalogue Quote',
+          catalogueSlug: window.location.pathname.split('/').pop() || 'Unknown Catalogue',
+          fullName: formData.get('fullName'),
+          phoneNumber: formData.get('phoneNumber'),
+          emailAddress: formData.get('emailAddress'),
+          location: formData.get('location'),
+          spaceType: formData.get('spaceType'),
+          wallWidth: formData.get('wallWidth'),
+          wallHeight: formData.get('wallHeight'),
+          projectDescription: formData.get('projectDescription')
+        };
+
+        try {
+          const response = await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (response.ok) {
+            quoteForm.classList.add('hidden');
+            quoteSuccessMessage.classList.remove('hidden');
+          } else {
+            throw new Error('Failed to send email');
+          }
+        } catch (error) {
+          console.error(error);
+          quoteErrorMessage.classList.remove('hidden');
+          if (quoteSubmitBtn) {
+            quoteSubmitBtn.disabled = false;
+            quoteSubmitBtn.textContent = 'Request Quote';
+          }
+        }
       });
     }
   }
