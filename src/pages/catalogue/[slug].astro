@@ -304,20 +304,20 @@ if (!catalogueData) {
 
         const formData = new FormData(quoteForm);
         const payload = {
-          formType: 'Catalogue Quote',
+          formType: 'quote',
           catalogueSlug: window.location.pathname.split('/').pop() || 'Unknown Catalogue',
-          fullName: formData.get('fullName'),
-          phoneNumber: formData.get('phoneNumber'),
-          emailAddress: formData.get('emailAddress'),
+          name: formData.get('fullName'),
+          phone: formData.get('phoneNumber'),
+          email: formData.get('emailAddress'),
           location: formData.get('location'),
           spaceType: formData.get('spaceType'),
           wallWidth: formData.get('wallWidth'),
           wallHeight: formData.get('wallHeight'),
-          projectDescription: formData.get('projectDescription')
+          message: formData.get('projectDescription')
         };
 
         try {
-          const response = await fetch('/api/send-email', {
+          const response = await fetch('/.netlify/functions/send-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
