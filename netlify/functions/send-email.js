@@ -34,14 +34,19 @@ export const handler = async (event, context) => {
     });
 
     const subject = `New ${formType} submission`;
-    const htmlBody = `
-      <h3>New Submission Details:</h3>
-      <p><strong>Form Type:</strong> ${formType}</p>
-      <p><strong>Name:</strong> ${name || 'N/A'}</p>
-      <p><strong>Email:</strong> ${email || 'N/A'}</p>
-      <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-      <p><strong>Message:</strong> ${message || 'N/A'}</p>
-    `;
+
+    let htmlContent = `<h3>New Submission Details:</h3>`;
+    htmlContent += `<p><strong>Form Type:</strong> ${formType}</p>`;
+
+    // Add dynamically mapped fields to support any form variables properly
+    for (const [key, value] of Object.entries(body)) {
+      if (key === 'formType') continue;
+
+      const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+      htmlContent += `<p><strong>${formattedKey}:</strong> ${value}</p>`;
+    }
+
+    const htmlBody = htmlContent;
 
     const info = await transporter.sendMail({
       from: SMTP_FROM || SMTP_USER,
