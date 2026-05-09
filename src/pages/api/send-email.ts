@@ -3,14 +3,39 @@ import nodemailer from 'nodemailer';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const data = await request.json();
+    const contentType = request.headers.get('content-type') || '';
+    let data: Record<string, any> = {};
+    let attachments: any[] = [];
 
-    const smtpHost = import.meta.env.SMTP_HOST || process.env.SMTP_HOST;
-    const smtpPort = import.meta.env.SMTP_PORT || process.env.SMTP_PORT;
-    const smtpUser = import.meta.env.SMTP_USER || process.env.SMTP_USER;
-    const smtpPass = import.meta.env.SMTP_PASS || process.env.SMTP_PASS;
-    const smtpFrom = import.meta.env.SMTP_FROM || process.env.SMTP_FROM || smtpUser;
-    const smtpTo = import.meta.env.SMTP_TO || process.env.SMTP_TO || smtpUser;
+    if (contentType.includes('application/json')) {
+      data = await request.json();
+    } else if (contentType.includes('multipart/form-data') || contentType.includes('application/x-www-form-urlencoded')) {
+      const formData = await request.formData();
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          if (value.size > 0) {
+            const arrayBuffer = await value.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            attachments.push({
+              filename: value.name,
+              content: buffer,
+              contentType: value.type,
+            });
+          }
+        } else {
+          data[key] = value;
+        }
+      }
+    } else {
+      data = await request.json(); // fallback
+    }
+
+    const smtpHost = import.meta.env.SMTP_HOST || (typeof process !== 'undefined' ? process.env.SMTP_HOST : undefined);
+    const smtpPort = import.meta.env.SMTP_PORT || (typeof process !== 'undefined' ? process.env.SMTP_PORT : undefined);
+    const smtpUser = import.meta.env.SMTP_USER || (typeof process !== 'undefined' ? process.env.SMTP_USER : undefined);
+    const smtpPass = import.meta.env.SMTP_PASS || (typeof process !== 'undefined' ? process.env.SMTP_PASS : undefined);
+    const smtpFrom = import.meta.env.SMTP_FROM || (typeof process !== 'undefined' ? process.env.SMTP_FROM : undefined) || smtpUser;
+    const smtpTo = import.meta.env.SMTP_TO || (typeof process !== 'undefined' ? process.env.SMTP_TO : undefined) || smtpUser;
 
     if (!smtpHost || !smtpPort || !smtpUser || !smtpPass) {
       console.error('SMTP credentials missing');
@@ -58,12 +83,16 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    const mailOptions = {
+    const mailOptions: any = {
       from: smtpFrom,
       to: smtpTo,
       subject: `${formType} from ${senderName}`,
       html: htmlContent,
     };
+
+    if (attachments.length > 0) {
+      mailOptions.attachments = attachments;
+    }
 
     const info = await transporter.sendMail(mailOptions);
     console.log('Message sent: %s', info.messageId);
