@@ -1,0 +1,215 @@
+
+> app@0.0.1 dev
+> astro dev
+
+15:08:35 [@astrojs/netlify] Enabling sessions with Netlify Blobs
+[vite] connected.
+15:08:39 [vite] Environment loaded
+15:08:39 [vite] Middleware loaded. Emulating features: aiGateway, blobs, database, edgeFunctions, functions, geolocation, headers, images, redirects, static.
+15:08:39 [vite] 💭 Linking this project to a Netlify site lets you deploy your site, use any environment variables defined on your team and site and much more. Run npx netlify init to get started.
+15:08:39 [types] Generated 1ms
+ astro  v6.2.1 ready in 7061 ms
+┃ Local    http://localhost:4321/
+┃ Network  use --host to expose
+15:08:39 watching for file changes...
+Error fetching catalogue paths: ClientError: Dataset not found - Dataset "production" not found for project ID "your-project-id"
+    at onResponse (/app/node_modules/@sanity/client/src/http/request.ts:13:13)
+    at applyMiddleware (/app/node_modules/get-it/src/util/middlewareReducer.ts:9:40)
+    at onResponse (/app/node_modules/get-it/src/createRequester.ts:62:22)
+    at <anonymous> (/app/node_modules/get-it/src/createRequester.ts:104:55)
+    at callback (/app/node_modules/get-it/src/request/node-request.ts:147:81)
+    at cb (/app/node_modules/get-it/src/request/node-request.ts:250:14)
+    at Transform.<anonymous> (/app/node_modules/get-it/src/request/node/simpleConcat.ts:8:13)
+    at Object.onceWrapper (node:events:633:28)
+    at Transform.emit (node:events:519:28)
+    at endReadableNT (/app/node_modules/readable-stream/lib/_stream_readable.js:1003:12) {
+  response: {
+    body: {
+      error: 'Dataset not found',
+      message: 'Dataset "production" not found for project ID "your-project-id"',
+      statusCode: 404
+    },
+    url: 'https://your-project-id.api.sanity.io/v2024-03-17/data/query/production?query=*%5B_type+%3D%3D+%22catalogue%22%5D%7B%0A++++++%22slug%22%3A+slug.current%0A++++%7D&returnQuery=false',
+    method: 'GET',
+    headers: {
+      date: 'Sat, 09 May 2026 15:08:57 GMT',
+      'content-type': 'application/json; charset=utf-8',
+      'ratelimit-remaining': '499',
+      'ratelimit-reset': '1',
+      'x-ratelimit-remaining-second': '499',
+      'x-ratelimit-limit-second': '500',
+      'ratelimit-limit': '500',
+      'content-length': '126',
+      vary: 'origin',
+      traceparent: '00-35c8f0ee421575014b4cba1f10b2306a-505136178e8c6722-01',
+      'sanity-gateway': 'k8s-gcp-us-c1-prod-ing-01',
+      'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
+      xkey: 'project-your-project-id, project-your-project-id-production',
+      via: '1.1 google',
+      'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    },
+    statusCode: 404,
+    statusMessage: 'Not Found',
+    remoteAddress: '34.107.216.191'
+  },
+  statusCode: 404,
+  responseBody: '{\n' +
+    '  "error": "Dataset not found",\n' +
+    '  "message": "Dataset \\"production\\" not found for project ID \\"your-project-id\\"",\n' +
+    '  "statusCode": 404\n' +
+    '}',
+  details: undefined
+}
+Error fetching catalogue data: ClientError: Dataset not found - Dataset "production" not found for project ID "your-project-id"
+    at onResponse (/app/node_modules/@sanity/client/src/http/request.ts:13:13)
+    at applyMiddleware (/app/node_modules/get-it/src/util/middlewareReducer.ts:9:40)
+    at onResponse (/app/node_modules/get-it/src/createRequester.ts:62:22)
+    at <anonymous> (/app/node_modules/get-it/src/createRequester.ts:104:55)
+    at callback (/app/node_modules/get-it/src/request/node-request.ts:147:81)
+    at cb (/app/node_modules/get-it/src/request/node-request.ts:250:14)
+    at Transform.<anonymous> (/app/node_modules/get-it/src/request/node/simpleConcat.ts:8:13)
+    at Object.onceWrapper (node:events:633:28)
+    at Transform.emit (node:events:519:28)
+    at endReadableNT (/app/node_modules/readable-stream/lib/_stream_readable.js:1003:12) {
+  response: {
+    body: {
+      message: 'Dataset "production" not found for project ID "your-project-id"',
+      error: 'Dataset not found',
+      statusCode: 404
+    },
+    url: 'https://your-project-id.api.sanity.io/v2024-03-17/data/query/production?query=*%5B_type+%3D%3D+%22catalogue%22+%26%26+slug.current+%3D%3D+%24slug%5D%5B0%5D%7B%0A++++title%2C%0A++++description%2C%0A++++%22images%22%3A+images%5B%5D.asset-%3Eurl%2C%0A++++%22pdfUrl%22%3A+pdfUrl.asset-%3Eurl%0A++%7D&%24slug=%22spring-collection-2024%22&returnQuery=false',
+    method: 'GET',
+    headers: {
+      date: 'Sat, 09 May 2026 15:08:57 GMT',
+      'content-type': 'application/json; charset=utf-8',
+      'x-ratelimit-remaining-second': '498',
+      'x-ratelimit-limit-second': '500',
+      'ratelimit-limit': '500',
+      'ratelimit-remaining': '498',
+      'ratelimit-reset': '1',
+      'content-length': '126',
+      vary: 'origin',
+      traceparent: '00-aa401ecb8cc012800a904d17f98e89ce-ff2344f333b7096c-01',
+      'sanity-gateway': 'k8s-gcp-us-c1-prod-ing-01',
+      'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
+      xkey: 'project-your-project-id, project-your-project-id-production',
+      via: '1.1 google',
+      'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    },
+    statusCode: 404,
+    statusMessage: 'Not Found',
+    remoteAddress: '34.107.216.191'
+  },
+  statusCode: 404,
+  responseBody: '{\n' +
+    '  "message": "Dataset \\"production\\" not found for project ID \\"your-project-id\\"",\n' +
+    '  "error": "Dataset not found",\n' +
+    '  "statusCode": 404\n' +
+    '}',
+  details: undefined
+}
+15:08:57 [200] /catalogue/spring-collection-2024 113ms
+SMTP credentials missing
+15:08:58 [500] POST /api/send-email 7ms
+Error fetching catalogue data: ClientError: Dataset not found - Dataset "production" not found for project ID "your-project-id"
+    at onResponse (/app/node_modules/@sanity/client/src/http/request.ts:13:13)
+    at applyMiddleware (/app/node_modules/get-it/src/util/middlewareReducer.ts:9:40)
+    at onResponse (/app/node_modules/get-it/src/createRequester.ts:62:22)
+    at <anonymous> (/app/node_modules/get-it/src/createRequester.ts:104:55)
+    at callback (/app/node_modules/get-it/src/request/node-request.ts:147:81)
+    at cb (/app/node_modules/get-it/src/request/node-request.ts:250:14)
+    at Transform.<anonymous> (/app/node_modules/get-it/src/request/node/simpleConcat.ts:8:13)
+    at Object.onceWrapper (node:events:633:28)
+    at Transform.emit (node:events:519:28)
+    at endReadableNT (/app/node_modules/readable-stream/lib/_stream_readable.js:1003:12) {
+  response: {
+    body: {
+      message: 'Dataset "production" not found for project ID "your-project-id"',
+      error: 'Dataset not found',
+      statusCode: 404
+    },
+    url: 'https://your-project-id.api.sanity.io/v2024-03-17/data/query/production?query=*%5B_type+%3D%3D+%22catalogue%22+%26%26+slug.current+%3D%3D+%24slug%5D%5B0%5D%7B%0A++++title%2C%0A++++description%2C%0A++++%22images%22%3A+images%5B%5D.asset-%3Eurl%2C%0A++++%22pdfUrl%22%3A+pdfUrl.asset-%3Eurl%0A++%7D&%24slug=%22spring-collection-2024%22&returnQuery=false',
+    method: 'GET',
+    headers: {
+      date: 'Sat, 09 May 2026 15:11:28 GMT',
+      'content-type': 'application/json; charset=utf-8',
+      'x-ratelimit-limit-second': '500',
+      'ratelimit-limit': '500',
+      'ratelimit-remaining': '499',
+      'ratelimit-reset': '1',
+      'x-ratelimit-remaining-second': '499',
+      'content-length': '126',
+      vary: 'origin',
+      traceparent: '00-450edb108161f3a2403985af376378f7-2916c35559dc0b0d-01',
+      'sanity-gateway': 'k8s-gcp-us-c1-prod-ing-01',
+      'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
+      xkey: 'project-your-project-id, project-your-project-id-production',
+      via: '1.1 google',
+      'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    },
+    statusCode: 404,
+    statusMessage: 'Not Found',
+    remoteAddress: '34.107.216.191'
+  },
+  statusCode: 404,
+  responseBody: '{\n' +
+    '  "message": "Dataset \\"production\\" not found for project ID \\"your-project-id\\"",\n' +
+    '  "error": "Dataset not found",\n' +
+    '  "statusCode": 404\n' +
+    '}',
+  details: undefined
+}
+15:11:28 [200] /catalogue/spring-collection-2024 23ms
+SMTP credentials missing
+15:11:30 [500] POST /api/send-email 2ms
+Error fetching catalogue data: ClientError: Dataset not found - Dataset "production" not found for project ID "your-project-id"
+    at onResponse (/app/node_modules/@sanity/client/src/http/request.ts:13:13)
+    at applyMiddleware (/app/node_modules/get-it/src/util/middlewareReducer.ts:9:40)
+    at onResponse (/app/node_modules/get-it/src/createRequester.ts:62:22)
+    at <anonymous> (/app/node_modules/get-it/src/createRequester.ts:104:55)
+    at callback (/app/node_modules/get-it/src/request/node-request.ts:147:81)
+    at cb (/app/node_modules/get-it/src/request/node-request.ts:250:14)
+    at Transform.<anonymous> (/app/node_modules/get-it/src/request/node/simpleConcat.ts:8:13)
+    at Object.onceWrapper (node:events:633:28)
+    at Transform.emit (node:events:519:28)
+    at endReadableNT (/app/node_modules/readable-stream/lib/_stream_readable.js:1003:12) {
+  response: {
+    body: {
+      error: 'Dataset not found',
+      statusCode: 404,
+      message: 'Dataset "production" not found for project ID "your-project-id"'
+    },
+    url: 'https://your-project-id.api.sanity.io/v2024-03-17/data/query/production?query=*%5B_type+%3D%3D+%22catalogue%22+%26%26+slug.current+%3D%3D+%24slug%5D%5B0%5D%7B%0A++++title%2C%0A++++description%2C%0A++++%22images%22%3A+images%5B%5D.asset-%3Eurl%2C%0A++++%22pdfUrl%22%3A+pdfUrl.asset-%3Eurl%0A++%7D&%24slug=%22spring-collection-2024%22&returnQuery=false',
+    method: 'GET',
+    headers: {
+      date: 'Sat, 09 May 2026 15:12:04 GMT',
+      'content-type': 'application/json; charset=utf-8',
+      'ratelimit-reset': '1',
+      'x-ratelimit-remaining-second': '499',
+      'x-ratelimit-limit-second': '500',
+      'ratelimit-limit': '500',
+      'ratelimit-remaining': '499',
+      'content-length': '126',
+      vary: 'origin',
+      traceparent: '00-7810874b291965e9f63fb43b93767a23-e4e8fe9abc48b1c9-01',
+      'sanity-gateway': 'k8s-gcp-us-c1-prod-ing-01',
+      'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
+      xkey: 'project-your-project-id, project-your-project-id-production',
+      via: '1.1 google',
+      'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    },
+    statusCode: 404,
+    statusMessage: 'Not Found',
+    remoteAddress: '34.107.216.191'
+  },
+  statusCode: 404,
+  responseBody: '{\n' +
+    '  "error": "Dataset not found",\n' +
+    '  "statusCode": 404,\n' +
+    '  "message": "Dataset \\"production\\" not found for project ID \\"your-project-id\\""\n' +
+    '}',
+  details: undefined
+}
+15:12:04 [200] /catalogue/spring-collection-2024 17ms
+SMTP credentials missing
+15:12:05 [500] POST /api/send-email 3ms

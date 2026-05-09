@@ -228,10 +228,10 @@ if (!catalogueData) {
   <Footer />
 </Layout>
 
-<script lang="ts">
+<script>
   function setupModal() {
     const modal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('modalImage') as HTMLImageElement;
+    const modalImage = document.getElementById('modalImage');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const triggers = document.querySelectorAll('[data-modal-trigger]');
 
@@ -240,7 +240,7 @@ if (!catalogueData) {
     // Open modal
     triggers.forEach(trigger => {
       trigger.addEventListener('click', (e) => {
-        const src = (e.currentTarget as HTMLElement).getAttribute('data-image-src');
+        const src = e.currentTarget.getAttribute('data-image-src');
         if (src) {
           modalImage.src = src;
           modal.classList.remove('opacity-0', 'pointer-events-none');
@@ -287,10 +287,10 @@ if (!catalogueData) {
   }
 
   function setupQuoteForm() {
-    const quoteForm = document.getElementById('quoteForm') as HTMLFormElement;
+    const quoteForm = document.getElementById('quoteForm');
     const quoteSuccessMessage = document.getElementById('quoteSuccessMessage');
     const quoteErrorMessage = document.getElementById('quoteErrorMessage');
-    const quoteSubmitBtn = document.getElementById('quoteSubmitBtn') as HTMLButtonElement;
+    const quoteSubmitBtn = document.getElementById('quoteSubmitBtn');
 
     if (quoteForm && quoteSuccessMessage && quoteErrorMessage) {
       quoteForm.addEventListener('submit', async (e) => {
@@ -303,24 +303,17 @@ if (!catalogueData) {
         }
 
         const formData = new FormData(quoteForm);
-        const payload = {
-          formType: 'quote',
-          catalogueSlug: window.location.pathname.split('/').pop() || 'Unknown Catalogue',
-          name: formData.get('fullName'),
-          phone: formData.get('phoneNumber'),
-          email: formData.get('emailAddress'),
-          location: formData.get('location'),
-          spaceType: formData.get('spaceType'),
-          wallWidth: formData.get('wallWidth'),
-          wallHeight: formData.get('wallHeight'),
-          message: formData.get('projectDescription')
-        };
+        formData.append('formType', 'quote');
+        formData.append('catalogueSlug', window.location.pathname.split('/').pop() || 'Unknown Catalogue');
+        formData.append('name', formData.get('fullName'));
+        formData.append('phone', formData.get('phoneNumber'));
+        formData.append('email', formData.get('emailAddress'));
+        formData.append('message', formData.get('projectDescription'));
 
         try {
           const response = await fetch('/api/send-email', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: formData
           });
 
           if (response.ok) {
